@@ -34,29 +34,33 @@ export default function Homepage() {
   }, []);
 
   // Calculate cityscape size based on scroll
-  const cityscapeScale = Math.min(0.7 + scrollY * 0.001, 1); // Grows from 1x to 2.5x
-  const cityscapeOpacity = Math.min(1 + scrollY * 0.001, 1); // Fades in from 0.3 to 1
+  const cityscapeScale = Math.min(0.7 + scrollY * 0.001, 1);
+  const cityscapeOpacity = Math.min(1 + scrollY * 0.001, 1);
   
-  // Calculate marker visibility and cityscape transformation
+  // Calculate different phases based on scroll
   const showMarkers = scrollY > 1000; // Show markers after scrolling past second section
-  const cityscapeTransform = `translateX(-50%) scale(${cityscapeScale})`; // Keep the same scale throughout
+  const showHumans = scrollY > 1600; // Show humans and start dissolving cityscape
+  const cityscapeTransform = `translateX(-50%) scale(${cityscapeScale})`;
   
-  // Marker positions (adjust these based on your cityscape image)
+  // Calculate cityscape dissolution - starts fading when humans appear
+  const cityscapeDisplayOpacity = showHumans ? Math.max(0, 1 - (scrollY - 1600) / 400) : cityscapeOpacity;
+  
+  // Marker positions (your original positions)
   const markers = [
-    { id: 1, x: '5%', y: '58%', color: '#EBBDD9' }, // Left side, upper building
-    { id: 2, x: '17%', y: '15%', color: '#EBBDD9' }, // Left-center, top (BNI Tower)
-    { id: 3, x: '31%', y: '55%', color: '#EBBDD9' }, // Left, lower
-    { id: 4, x: '48%', y: '70%', color: '#EBBDD9' }, // Center, GBK
-    { id: 5, x: '60%', y: '42%', color: '#EBBDD9' }, // Far right, mid-level
-    { id: 6, x: '73%', y: '36%', color: '#EBBDD9' }, // Left, lower building
-    { id: 7, x: '92%', y: '20%', color: '#EBBDD9' }  // Center-right, lower
+    { id: 1, x: '5%', y: '58%', color: '#EBBDD9' },
+    { id: 2, x: '17%', y: '15%', color: '#EBBDD9' },
+    { id: 3, x: '31%', y: '55%', color: '#EBBDD9' },
+    { id: 4, x: '48%', y: '70%', color: '#EBBDD9' },
+    { id: 5, x: '60%', y: '42%', color: '#EBBDD9' },
+    { id: 6, x: '73%', y: '36%', color: '#EBBDD9' },
+    { id: 7, x: '92%', y: '20%', color: '#EBBDD9' }
   ];
 
   return (
     <div style={{
       fontFamily: 'Space Mono, monospace',
       position: 'relative',
-      backgroundColor: '#FEFBEE', // Add the beige background to the main container
+      backgroundColor: '#FEFBEE',
       minHeight: '100vh'
     }}>
       {/* Navigation Header */}
@@ -185,7 +189,7 @@ export default function Homepage() {
           transition: 'transform 0.1s ease-out',
           zIndex: 10,
           position: 'relative',
-          whiteSpace: 'pre-line'  // ← ADD THIS LINE
+          whiteSpace: 'pre-line'
         }}>
           {displayedText}
           <span style={{
@@ -227,19 +231,19 @@ export default function Homepage() {
           Explore Sela Kota Jakarta
         </a>
 
-        {/* Growing Jakarta Cityscape stuck to bottom */}
+        {/* Growing Jakarta Cityscape stuck to bottom - dissolves when humans appear */}
         <div style={{
           position: 'fixed',
           bottom: '0',
           left: '50%',
           transform: cityscapeTransform,
           transformOrigin: 'bottom center',
-          opacity: cityscapeOpacity,
-          transition: 'transform 0.3s ease-out, opacity 0.1s ease-out',
+          opacity: cityscapeDisplayOpacity,
+          transition: 'transform 0.3s ease-out, opacity 0.5s ease-out',
           width: '100%',
           maxWidth: '1200px',
           zIndex: 1,
-          pointerEvents: 'none' // Allows clicking through the image
+          pointerEvents: 'none'
         }}>
           <img 
             src="/jakarta-cityscape.png" 
@@ -251,8 +255,8 @@ export default function Homepage() {
             }}
           />
           
-          {/* Interactive Markers */}
-          {showMarkers && markers.map((marker) => (
+          {/* Interactive Markers - also fade out with cityscape */}
+          {showMarkers && !showHumans && markers.map((marker) => (
             <div
               key={marker.id}
               style={{
@@ -260,8 +264,8 @@ export default function Homepage() {
                 left: marker.x,
                 top: marker.y,
                 transform: 'translate(-50%, -50%)',
-                width: '62px',        // ← Adjust marker width here
-                height: '70px',       // ← Adjust marker height here
+                width: '62px',
+                height: '70px',
                 cursor: 'pointer',
                 pointerEvents: 'auto',
                 zIndex: 10,
@@ -273,7 +277,6 @@ export default function Homepage() {
               onMouseLeave={() => setHoveredMarker(null)}
               onClick={() => console.log(`Clicked marker ${marker.id}`)}
             >
-              {/* Marker Pin SVG */}
               <img
                 src="/pin-home.svg"
                 alt="Location Pin"
@@ -288,6 +291,90 @@ export default function Homepage() {
             </div>
           ))}
         </div>
+
+        {/* Human Illustrations - appear after cityscape dissolves */}
+        {showHumans && (
+          <div style={{
+            position: 'fixed',
+            bottom: '0',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            transformOrigin: 'bottom center',
+            width: '100%',
+            maxWidth: '1200px',
+            height: '400px', // Set container height for stacking
+            zIndex: 1,
+            pointerEvents: 'none'
+          }}>
+            {/* Human 1 */}
+            <img 
+              src="/human-1.png" 
+              alt="Person 1" 
+              style={{
+                position: 'absolute',
+                bottom: '4%',
+                left: '-8%', // Horizontal position
+                height: '500px',
+                width: 'auto',
+                zIndex: 2, // Controls stacking order (higher = on top)
+                opacity: Math.min(1, Math.max(0, (scrollY - 1700) / 200)),
+                transform: `translateY(${Math.max(0, 1800 - scrollY) * 0.3}px)`,
+                transition: 'opacity 0.3s ease, transform 0.3s ease'
+              }}
+            />
+            
+            {/* Human 2 */}
+            <img 
+              src="/human-2.png" 
+              alt="Person 2" 
+              style={{
+                position: 'absolute',
+                bottom: '3%',
+                left: '13%', // Overlapping position
+                height: '290px',
+                width: 'auto',
+                zIndex: 1, // In front of Human 1
+                opacity: Math.min(1, Math.max(0, (scrollY - 1800) / 200)),
+                transform: `translateY(${Math.max(0, 1900 - scrollY) * 0.3}px)`,
+                transition: 'opacity 0.3s ease, transform 0.3s ease'
+              }}
+            />
+            
+            {/* Human 3 */}
+            <img 
+              src="/human-3.png" 
+              alt="Person 3" 
+              style={{
+                position: 'absolute',
+                bottom: '5%',
+                left: '48%', // Overlapping position
+                height: '320px',
+                width: 'auto',
+                zIndex: 4, // In front of Human 2
+                opacity: Math.min(1, Math.max(0, (scrollY - 1900) / 200)),
+                transform: `translateY(${Math.max(0, 2000 - scrollY) * 0.3}px)`,
+                transition: 'opacity 0.3s ease, transform 0.3s ease'
+              }}
+            />
+            
+            {/* Human 4 */}
+            <img 
+              src="/human-4.png" 
+              alt="Person 4" 
+              style={{
+                position: 'absolute',
+                bottom: '15%',
+                left: '80%', // Overlapping position
+                height: '400px',
+                width: 'auto',
+                zIndex: 3, // On top of all others
+                opacity: Math.min(1, Math.max(0, (scrollY - 1700) / 200)), // ← Same as Human 1: appears at 1700px
+                transform: `translateY(${Math.max(0, 1800 - scrollY) * 0.3}px)`, // ← Same timing as Human 1
+                transition: 'opacity 0.3s ease, transform 0.3s ease'
+              }}
+            />
+          </div>
+        )}
 
         {/* CSS Animation for marker fade in */}
         <style>
@@ -338,9 +425,9 @@ export default function Homepage() {
         }}></div>
       </section>
 
-      {/* Second Section with New Text - Transparent background */}
+      {/* Second Section with New Text */}
       <section style={{
-        backgroundColor: 'transparent', // Changed from '#FEFBEE' to transparent
+        backgroundColor: 'transparent',
         padding: '100px 40px 200px',
         position: 'relative',
         zIndex: 10,
@@ -401,6 +488,40 @@ export default function Homepage() {
           }}>
             But what happens in the pauses?<br/>
             In the spaces we pass by, but rarely see?
+          </p>
+        </div>
+      </section>
+
+      {/* Fourth Section with Human Stories Text */}
+      <section style={{
+        backgroundColor: 'transparent',
+        padding: '100px 40px 200px',
+        position: 'relative',
+        zIndex: 10,
+        minHeight: '50vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}>
+        <div style={{
+          textAlign: 'center',
+          maxWidth: '600px',
+          margin: '0 auto',
+          transform: `translateY(${Math.max(0, (scrollY - 1600) * -0.1) - 100}px)`,
+          opacity: Math.min(1, Math.max(0, (scrollY - 1600) / 300)),
+          transition: 'transform 0.1s ease-out, opacity 0.1s ease-out'
+        }}>
+          <p style={{
+            fontSize: '16px',
+            lineHeight: '1.8',
+            color: '#2c2c2c',
+            fontFamily: 'Space Mono, monospace',
+            fontWeight: '400',
+            marginBottom: '0'
+          }}>
+            Meaning lives in the in-between. In a quiet warung, a glance<br/>
+            between strangers, a balcony overlooking the sunset.<br/>
+            sela kota exists to bring those overlooked spaces and feelings into view.
           </p>
         </div>
       </section>
