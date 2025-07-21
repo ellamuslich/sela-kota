@@ -114,20 +114,6 @@ export default function Homepage() {
             Map
           </a>
           <a 
-            href="#about" 
-            style={{
-              textDecoration: 'none',
-              color: '#2c2c2c',
-              fontSize: '16px',
-              fontWeight: '400',
-              transition: 'opacity 0.3s ease'
-            }}
-            onMouseEnter={(e) => e.target.style.opacity = '0.6'}
-            onMouseLeave={(e) => e.target.style.opacity = '1'}
-          >
-            About us
-          </a>
-          <a 
             href="https://instagram.com/sela__kota"
             target="_blank"
             rel="noopener noreferrer" 
