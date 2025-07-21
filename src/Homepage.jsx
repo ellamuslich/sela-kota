@@ -34,22 +34,22 @@ export default function Homepage() {
   }, []);
 
   // Calculate cityscape size based on scroll
-  const cityscapeScale = Math.min(0.7 + scrollY * 0.001, 1.25); // Grows from 1x to 2.5x
+  const cityscapeScale = Math.min(0.7 + scrollY * 0.001, 1); // Grows from 1x to 2.5x
   const cityscapeOpacity = Math.min(1 + scrollY * 0.001, 1); // Fades in from 0.3 to 1
   
   // Calculate marker visibility and cityscape transformation
   const showMarkers = scrollY > 1000; // Show markers after scrolling past second section
-  const cityscapeTransform = scrollY > 1000 ? 'translateX(-50%) scale(1.5)' : `translateX(-50%) scale(${cityscapeScale})`;
+  const cityscapeTransform = `translateX(-50%) scale(${cityscapeScale})`; // Keep the same scale throughout
   
   // Marker positions (adjust these based on your cityscape image)
   const markers = [
-    { id: 1, x: '15%', y: '25%', color: '#EBBDD9' },
-    { id: 2, x: '35%', y: '15%', color: '#EBBDD9' },
-    { id: 3, x: '55%', y: '20%', color: '#EBBDD9' },
-    { id: 4, x: '75%', y: '18%', color: '#EBBDD9' },
-    { id: 5, x: '85%', y: '30%', color: '#EBBDD9' },
-    { id: 6, x: '25%', y: '45%', color: '#EBBDD9' },
-    { id: 7, x: '65%', y: '55%', color: '#EBBDD9' }
+    { id: 1, x: '5%', y: '58%', color: '#EBBDD9' }, // Left side, upper building
+    { id: 2, x: '17%', y: '15%', color: '#EBBDD9' }, // Left-center, top (BNI Tower)
+    { id: 3, x: '31%', y: '55%', color: '#EBBDD9' }, // Left, lower
+    { id: 4, x: '48%', y: '70%', color: '#EBBDD9' }, // Center, GBK
+    { id: 5, x: '60%', y: '42%', color: '#EBBDD9' }, // Far right, mid-level
+    { id: 6, x: '73%', y: '36%', color: '#EBBDD9' }, // Left, lower building
+    { id: 7, x: '92%', y: '20%', color: '#EBBDD9' }  // Center-right, lower
   ];
 
   return (
@@ -260,8 +260,8 @@ export default function Homepage() {
                 left: marker.x,
                 top: marker.y,
                 transform: 'translate(-50%, -50%)',
-                width: '24px',
-                height: '32px',
+                width: '62px',        // ← Adjust marker width here
+                height: '70px',       // ← Adjust marker height here
                 cursor: 'pointer',
                 pointerEvents: 'auto',
                 zIndex: 10,
