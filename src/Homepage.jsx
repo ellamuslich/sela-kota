@@ -12,6 +12,7 @@ export default function Homepage() {
   const [displayedText, setDisplayedText] = useState('');
   const [currentIndex, setCurrentIndex] = useState(0);
   const [scrollY, setScrollY] = useState(0);
+  const [hoveredMarker, setHoveredMarker] = useState(null);
   const fullText = "Add your story. Find a new one.\nDiscover Jakarta, in between.";
 
   useEffect(() => {
@@ -35,6 +36,21 @@ export default function Homepage() {
   // Calculate cityscape size based on scroll
   const cityscapeScale = Math.min(0.7 + scrollY * 0.001, 1.25); // Grows from 1x to 2.5x
   const cityscapeOpacity = Math.min(1 + scrollY * 0.001, 1); // Fades in from 0.3 to 1
+  
+  // Calculate marker visibility and cityscape transformation
+  const showMarkers = scrollY > 1000; // Show markers after scrolling past second section
+  const cityscapeTransform = scrollY > 1000 ? 'translateX(-50%) scale(1.5)' : `translateX(-50%) scale(${cityscapeScale})`;
+  
+  // Marker positions (adjust these based on your cityscape image)
+  const markers = [
+    { id: 1, x: '15%', y: '25%', color: '#EBBDD9' },
+    { id: 2, x: '35%', y: '15%', color: '#EBBDD9' },
+    { id: 3, x: '55%', y: '20%', color: '#EBBDD9' },
+    { id: 4, x: '75%', y: '18%', color: '#EBBDD9' },
+    { id: 5, x: '85%', y: '30%', color: '#EBBDD9' },
+    { id: 6, x: '25%', y: '45%', color: '#EBBDD9' },
+    { id: 7, x: '65%', y: '55%', color: '#EBBDD9' }
+  ];
 
   return (
     <div style={{
@@ -179,16 +195,6 @@ export default function Homepage() {
           }}>|</span>
         </p>
 
-        {/* CSS Animation for blinking cursor */}
-        <style>
-          {`
-            @keyframes blink {
-              0%, 50% { opacity: 1; }
-              51%, 100% { opacity: 0; }
-            }
-          `}
-        </style>
-
         {/* Call to Action Button */}
         <a 
           href="/map"
@@ -226,10 +232,10 @@ export default function Homepage() {
           position: 'fixed',
           bottom: '0',
           left: '50%',
-          transform: `translateX(-50%) scale(${cityscapeScale})`,
+          transform: cityscapeTransform,
           transformOrigin: 'bottom center',
           opacity: cityscapeOpacity,
-          transition: 'transform 0.1s ease-out, opacity 0.1s ease-out',
+          transition: 'transform 0.3s ease-out, opacity 0.1s ease-out',
           width: '100%',
           maxWidth: '1200px',
           zIndex: 1,
@@ -244,7 +250,88 @@ export default function Homepage() {
               display: 'block'
             }}
           />
+          
+          {/* Interactive Markers */}
+          {showMarkers && markers.map((marker) => (
+            <div
+              key={marker.id}
+              style={{
+                position: 'absolute',
+                left: marker.x,
+                top: marker.y,
+                transform: 'translate(-50%, -50%)',
+                width: '24px',
+                height: '32px',
+                cursor: 'pointer',
+                pointerEvents: 'auto',
+                zIndex: 10,
+                opacity: showMarkers ? 1 : 0,
+                transition: 'opacity 0.5s ease, transform 0.3s ease',
+                animation: showMarkers ? `fadeInMarker 0.8s ease ${marker.id * 0.1}s both` : 'none'
+              }}
+              onMouseEnter={() => setHoveredMarker(marker.id)}
+              onMouseLeave={() => setHoveredMarker(null)}
+              onClick={() => console.log(`Clicked marker ${marker.id}`)}
+            >
+              {/* Marker Pin SVG */}
+              <svg
+                viewBox="0 0 24 32"
+                fill="none"
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  filter: hoveredMarker === marker.id ? 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))' : 'none',
+                  transform: hoveredMarker === marker.id ? 'scale(1.1)' : 'scale(1)',
+                  transition: 'all 0.3s ease'
+                }}
+              >
+                <path
+                  d="M12 0C5.4 0 0 5.4 0 12c0 7.2 12 20 12 20s12-12.8 12-20c0-6.6-5.4-12-12-12z"
+                  fill={hoveredMarker === marker.id ? '#2c2c2c' : marker.color}
+                  style={{ transition: 'fill 0.3s ease' }}
+                />
+                <circle
+                  cx="12"
+                  cy="12"
+                  r="4"
+                  fill="white"
+                />
+                <text
+                  x="12"
+                  y="16"
+                  textAnchor="middle"
+                  fontSize="8"
+                  fontFamily="Space Mono, monospace"
+                  fontWeight="bold"
+                  fill="#2c2c2c"
+                >
+                  ✱
+                </text>
+              </svg>
+            </div>
+          ))}
         </div>
+
+        {/* CSS Animation for marker fade in */}
+        <style>
+          {`
+            @keyframes blink {
+              0%, 50% { opacity: 1; }
+              51%, 100% { opacity: 0; }
+            }
+            
+            @keyframes fadeInMarker {
+              0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.8) translateY(10px);
+              }
+              100% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1) translateY(0);
+              }
+            }
+          `}
+        </style>
 
         {/* Subtle decorative elements */}
         <div style={{
@@ -304,6 +391,39 @@ export default function Homepage() {
             Too often, Jakarta is defined by the hustle and bustle<br/>
             — the concrete jungle, the noise, the blinding lights.<br/>
             It's loud, fast, and always moving.
+          </p>
+        </div>
+      </section>
+
+      {/* Third Section with Interactive Map Text */}
+      <section style={{
+        backgroundColor: 'transparent',
+        padding: '100px 40px 200px',
+        position: 'relative',
+        zIndex: 10,
+        minHeight: '50vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}>
+        <div style={{
+          textAlign: 'center',
+          maxWidth: '600px',
+          margin: '0 auto',
+          transform: `translateY(${Math.max(0, (scrollY - 800) * -0.1) - 100}px)`,
+          opacity: Math.min(1, Math.max(0, (scrollY - 800) / 300)),
+          transition: 'transform 0.1s ease-out, opacity 0.1s ease-out'
+        }}>
+          <p style={{
+            fontSize: '16px',
+            lineHeight: '1.8',
+            color: '#2c2c2c',
+            fontFamily: 'Space Mono, monospace',
+            fontWeight: '400',
+            marginBottom: '0'
+          }}>
+            But what happens in the pauses?<br/>
+            In the spaces we pass by, but rarely see?
           </p>
         </div>
       </section>
