@@ -1000,12 +1000,13 @@ function AnimatedSearchBar({
     }
   };
 
+  //Search icon positioning
   return (
     <div 
       ref={containerRef}
       style={{
         position: 'absolute',
-        top: '34px',
+        top: '20px',
         left: '20px',
         zIndex: 1001,
       }}
