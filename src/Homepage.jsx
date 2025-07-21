@@ -235,36 +235,13 @@ export default function Homepage() {
           zIndex: 1,
           pointerEvents: 'none' // Allows clicking through the image
         }}>
-          {/* Background skyline - static */}
-          <img 
-            src="/background-skyline.png" 
-            alt="Background Skyline" 
-            style={{
-              position: 'absolute',
-              bottom: '0',
-              left: '50%',
-              transform: 'translateX(-50%)',
-              width: '100%',
-              height: 'auto',
-              opacity: '0.7', // Make it subtle behind main cityscape
-              zIndex: 1
-            }}
-          />
-          
-          {/* Main Jakarta cityscape - animated */}
           <img 
             src="/jakarta-cityscape.png" 
             alt="Jakarta Cityscape" 
             style={{
-              position: 'relative',
               width: '100%',
               height: 'auto',
-              display: 'block',
-              transform: `scale(${cityscapeScale})`,
-              transformOrigin: 'bottom center',
-              opacity: cityscapeOpacity,
-              transition: 'transform 0.1s ease-out, opacity 0.1s ease-out',
-              zIndex: 2
+              display: 'block'
             }}
           />
         </div>
