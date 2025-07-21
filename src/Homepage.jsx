@@ -274,40 +274,17 @@ export default function Homepage() {
               onClick={() => console.log(`Clicked marker ${marker.id}`)}
             >
               {/* Marker Pin SVG */}
-              <svg
-                viewBox="0 0 24 32"
-                fill="none"
+              <img
+                src="/pin-home.svg"
+                alt="Location Pin"
                 style={{
                   width: '100%',
                   height: '100%',
-                  filter: hoveredMarker === marker.id ? 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))' : 'none',
+                  filter: hoveredMarker === marker.id ? 'drop-shadow(0 4px 8px rgba(0,0,0,0.3)) brightness(0.7)' : 'none',
                   transform: hoveredMarker === marker.id ? 'scale(1.1)' : 'scale(1)',
                   transition: 'all 0.3s ease'
                 }}
-              >
-                <path
-                  d="M12 0C5.4 0 0 5.4 0 12c0 7.2 12 20 12 20s12-12.8 12-20c0-6.6-5.4-12-12-12z"
-                  fill={hoveredMarker === marker.id ? '#2c2c2c' : marker.color}
-                  style={{ transition: 'fill 0.3s ease' }}
-                />
-                <circle
-                  cx="12"
-                  cy="12"
-                  r="4"
-                  fill="white"
-                />
-                <text
-                  x="12"
-                  y="16"
-                  textAnchor="middle"
-                  fontSize="8"
-                  fontFamily="Space Mono, monospace"
-                  fontWeight="bold"
-                  fill="#2c2c2c"
-                >
-                  ✱
-                </text>
-              </svg>
+              />
             </div>
           ))}
         </div>
