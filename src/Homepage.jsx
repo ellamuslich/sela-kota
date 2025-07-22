@@ -50,9 +50,9 @@ export default function Homepage() {
   const getScrollThresholds = () => {
     if (isMobile) {
       return {
-        markersThreshold: 800,
-        humansThreshold: 1200,
-        humansFadeStart: 1400
+        markersThreshold: 600,
+        humansThreshold: 800,
+        humansFadeStart: 1000
       };
     } else if (isTablet) {
       return {
