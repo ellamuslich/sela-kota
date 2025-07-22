@@ -8,6 +8,28 @@ if (!document.head.querySelector('link[href*="Space+Mono"]')) {
   document.head.appendChild(fontLink);
 }
 
+// Add targeted CSS reset to fix white corners without breaking scroll
+const globalStyles = `
+  html, body {
+    margin: 0;
+    padding: 0;
+    background-color: #FEFBEE;
+    overflow-x: hidden;
+  }
+  
+  #root {
+    background-color: #FEFBEE;
+  }
+`;
+
+// Add the styles to the document
+if (!document.getElementById('global-styles')) {
+  const styleSheet = document.createElement('style');
+  styleSheet.id = 'global-styles';
+  styleSheet.textContent = globalStyles;
+  document.head.appendChild(styleSheet);
+}
+
 export default function Homepage() {
   const [displayedText, setDisplayedText] = useState('');
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -184,7 +206,9 @@ const humanPos = getHumanPositions();
       fontFamily: 'Space Mono, monospace',
       position: 'relative',
       backgroundColor: '#FEFBEE',
-      minHeight: '100vh'
+      minHeight: '100vh',
+      margin: 0,
+      padding: 0
     }}>
       {/* Navigation Header */}
       <nav style={{
@@ -629,7 +653,7 @@ const humanPos = getHumanPositions();
           textAlign: 'center',
           maxWidth: isMobile ? '320px' : isTablet ? '500px' : '600px',
           margin: '0 auto',
-          transform: `translateY(${Math.max(0, (scrollY - 1600) * -0.1) - 100}px)`,
+          transform: `translateY(${Math.max(0, (scrollY - 1600) * -0.1) - 150}px)`,
           opacity: Math.min(1, Math.max(0, (scrollY - 1400) / 300)),
           transition: 'transform 0.1s ease-out, opacity 0.1s ease-out'
         }}>
