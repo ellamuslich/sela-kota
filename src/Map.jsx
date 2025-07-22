@@ -3,7 +3,9 @@ import { useEffect, useRef, useState } from 'react';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 
-// Custom scrollbar styles
+// Custom scrollbar styles - to make it invisible
+// This will hide the scrollbar for elements with the class 'custom-scrollbar'
+// Note: This is a global style, so it will apply to all elements with this class
 const scrollbarStyles = `
   .custom-scrollbar::-webkit-scrollbar {
     display: none;
@@ -25,6 +27,20 @@ document.head.appendChild(fontLink);
 
 // NEW: Guidelines Modal Component
 function GuidelinesModal({ isOpen, onClose }) {
+
+  //Responsive state
+  const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
+
+  //Responsive useEffect
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  //Breakpoints
+  const isMobile = windowWidth <= 768;
+
   if (!isOpen) return null;
 
   return (
@@ -40,16 +56,17 @@ function GuidelinesModal({ isOpen, onClose }) {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      zIndex: 10001
+      zIndex: 10001,
+      padding: isMobile ? '20px' : '0'
     }}>
       <div 
         className="custom-scrollbar"
         style={{
           backgroundColor: '#FEFBEE',
           borderRadius: '20px',
-          padding: '40px',
-          maxWidth: '600px',
-          width: '90%',
+          padding: isMobile ? '25px 15px' : '40px',    // SMALLER padding on mobile
+          maxWidth: isMobile ? '350px' : '600px',      // FIXED width on mobile
+          width: isMobile ? '350px' : '90%',           // FIXED width on mobile
           maxHeight: '80vh',
           overflow: 'auto',
           fontFamily: 'Space Mono, monospace',
@@ -173,6 +190,20 @@ function GuidelinesModal({ isOpen, onClose }) {
 
 // NEW: Privacy Policy Modal Component
 function PrivacyPolicyModal({ isOpen, onClose }) {
+  
+  //Responsive state
+  const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
+
+  //Responsive useEffect
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  //Breakpoints
+  const isMobile = windowWidth <= 768;
+
   if (!isOpen) return null;
 
   return (
@@ -188,15 +219,16 @@ function PrivacyPolicyModal({ isOpen, onClose }) {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      zIndex: 10001
+      zIndex: 10001,
+      padding: isMobile ? '20px' : '0'
     }}>
       <div 
         className="custom-scrollbar"
         style={{
           backgroundColor: '#FEFBEE',
           borderRadius: '20px',
-          padding: '40px',
-          maxWidth: '600px',
+          padding: isMobile ? '30px 20px' : '40px',
+          maxWidth: isMobile ? '100%' : '600px',
           width: '90%',
           maxHeight: '80vh',
           overflow: 'auto',
@@ -369,6 +401,19 @@ function StoryForm({ isOpen, onClose, onSave, location }) {
   const [mediaFiles, setMediaFiles] = useState([]);
   const fileInputRef = useRef(null);
 
+  //Responsive State-Story Form
+  const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
+
+  //Responsive useEffect-Story Form
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  //Breakpoint-Story Form
+  const isMobile = windowWidth <= 768;
+
   const handleFileUpload = (event) => {
     const files = Array.from(event.target.files);
     const validFiles = files.filter(file => {
@@ -441,13 +486,14 @@ function StoryForm({ isOpen, onClose, onSave, location }) {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      zIndex: 10000
+      zIndex: 10000,
+      padding: isMobile ? '20px' : '0'
     }}>
       <div style={{
         backgroundColor: '#EBE8D8',
         borderRadius: '40px',
-        padding: '30px',
-        maxWidth: '400px',
+        padding: isMobile ? '25px 20px' : '30px',
+        maxWidth: isMobile ? '100%' : '400px',   
         width: '90%',
         maxHeight: '80vh',
         overflow: 'auto',
@@ -721,6 +767,19 @@ function StoryForm({ isOpen, onClose, onSave, location }) {
 function IndividualStoryViewer({ isOpen, onClose, story }) {
   const [locationName, setLocationName] = useState('Loading location...');
 
+  // Responsive State - Individual Story Viewer
+  const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
+
+  // Responsive useEffect - Individual Story Viewer
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Breakpoint - Individual Story Viewer
+  const isMobile = windowWidth <= 768;
+
   useEffect(() => {
     const fetchLocationName = async () => {
       try {
@@ -785,15 +844,16 @@ function IndividualStoryViewer({ isOpen, onClose, story }) {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      zIndex: 10000
+      zIndex: 10000,
+      padding: isMobile ? '20px' : '0'
     }}>
       <div 
         className="custom-scrollbar"
         style={{
           backgroundColor: '#FEFBEE',
           borderRadius: '20px',
-          padding: '30px',
-          maxWidth: '500px',
+          padding: isMobile ? '25px 20px' : '30px',
+          maxWidth: isMobile ? '100%' : '500px', 
           width: '90%',
           maxHeight: '80vh',
           overflow: 'auto',
@@ -947,8 +1007,22 @@ function AnimatedSearchBar({
 }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [inputValue, setInputValue] = useState('');
+
+  //Responsive state search bar
+  const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
+
   const inputRef = useRef(null);
   const containerRef = useRef(null);
+
+  //Responsive useEffect search bar
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  //Breakpoint for search bar
+   const isMobile = windowWidth <= 768;
 
   // Handle clicks outside to collapse
   useEffect(() => {
@@ -1002,12 +1076,10 @@ function AnimatedSearchBar({
 
   //Search icon positioning
   return (
-    <div 
-      ref={containerRef}
-      style={{
+    <div ref={containerRef} style={{
         position: 'absolute',
-        top: '20px',
-        left: '20px',
+        top: isMobile ? '20px' : '20px',
+        left: isMobile ? '15px' : '20px',
         zIndex: 1001,
       }}
     >
@@ -1019,8 +1091,8 @@ function AnimatedSearchBar({
         WebkitBackdropFilter: 'blur(10px)', // Safari support
         borderRadius: '25px',
         boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-        width: isExpanded ? '320px' : '50px',
-        height: '50px',
+        width: isMobile ? '45px' : (isExpanded ? '320px' : '50px'),
+        height: isMobile ? '45px' : '50px', 
         transition: 'width 0.3s ease-in-out',
         overflow: 'hidden'
       }}>
@@ -1029,7 +1101,8 @@ function AnimatedSearchBar({
           type="button"
           onClick={handleExpand}
           style={{
-            width: isExpanded ? '50px' : '100%',
+            width: isMobile ? '100%' : (isExpanded ? '50px' : '100%'),
+            height: isMobile ? '45px' : '50px',
             height: '50px',
             border: 'none',
             background: 'none',
@@ -1041,35 +1114,37 @@ function AnimatedSearchBar({
             flexShrink: 0
           }}
         >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <svg width={isMobile ? "18" : "20"} height={isMobile ? "18" : "20"} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <circle cx="11" cy="11" r="8"></circle>
             <path d="m21 21-4.35-4.35"></path>
           </svg>
         </button>
 
-        {/* Search Input */}
-        <input
-          ref={inputRef}
-          type="text"
-          value={inputValue}
-          onChange={handleInputChange}
-          placeholder={placeholder}
-          style={{
-            border: 'none',
-            outline: 'none',
-            background: 'none',
-            flex: 1,
-            fontSize: '14px',
-            color: '#111827',
-            fontFamily: 'Space Mono, monospace',
-            opacity: isExpanded ? 1 : 0,
-            transition: 'opacity 0.3s ease-in-out',
-            paddingRight: '40px'
-          }}
-        />
+        {/* Search Input - hide on mobile when expanded separately */}
+        {!isMobile && (
+          <input
+            ref={inputRef}
+            type="text"
+            value={inputValue}
+            onChange={handleInputChange}
+            placeholder={placeholder}
+            style={{
+              border: 'none',
+              outline: 'none',
+              background: 'none',
+              flex: 1,
+              fontSize: isMobile ? '12px' : '14px',
+              color: '#111827',
+              fontFamily: 'Space Mono, monospace',
+              opacity: isExpanded ? 1 : 0,
+              transition: 'opacity 0.3s ease-in-out',
+              paddingRight: '40px'
+            }}
+          />
+        )}
 
         {/* Clear Button */}
-        {isExpanded && inputValue && (
+        {!isMobile && isExpanded && inputValue && (
           <button
             type="button"
             onClick={handleClear}
@@ -1095,13 +1170,48 @@ function AnimatedSearchBar({
         )}
       </div>
 
+      {/* Mobile expanded input - shows below the search icon */}
+      {isMobile && isExpanded && (
+        <div style={{
+          position: 'absolute',
+          top: '55px', // Below the search icon
+          left: '0',
+          right: '0',
+          backgroundColor: 'rgba(255, 255, 255, 0.4)',
+          backdropFilter: 'blur(10px)',
+          WebkitBackdropFilter: 'blur(10px)',
+          borderRadius: '40px',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+          padding: '12px',
+          zIndex: 1002,
+          width: '200px'
+        }}>
+          <input
+            ref={inputRef}
+            type="text"
+            value={inputValue}
+            onChange={handleInputChange}
+            placeholder="Search Sela Kota..."
+            style={{
+              border: 'none',
+              outline: 'none',
+              background: 'none',
+              width: '100%',
+              fontSize: '12px',
+              color: '#111827',
+              fontFamily: 'Space Mono, monospace'
+            }}
+          />
+        </div>
+      )}
+
       {/* Search Results Dropdown */}
       {isExpanded && (inputValue.trim() !== '') && (
         <div 
           className="custom-scrollbar"
           style={{
           position: 'absolute',
-          top: '60px',
+          top: isMobile ? '115px' : '60px',
           left: '0',
           right: '0',
           backgroundColor: 'rgba(255, 255, 255, 0.4)',
@@ -1113,12 +1223,13 @@ function AnimatedSearchBar({
           overflowY: 'auto',
           zIndex: 1002,
           scrollbarWidth: 'none',
+          width: isMobile ? '220px' : 'auto',
         }}>
            {isSearching && searchResults.length === 0 && (
             <div style={{
               padding: '12px 16px',
               color: '#6B7280',
-              fontSize: '14px',
+              fontSize: isMobile ? '12px' : '14px',
               fontFamily: 'Space Mono, monospace'
             }}>
               Searching...
@@ -1162,10 +1273,24 @@ function AnimatedSearchBar({
   );
 }
 
-// NEW: Expandable Instruction Panel Component
+//Expandable Instruction Panel Component
 function ExpandableInstructionPanel({ onFilterChange, activeFilters, onPrivacyPolicyClick, onGuidelinesClick }) {
-  const [isExpanded, setIsExpanded] = useState(true); // Start expanded
-  
+  const [isExpanded, setIsExpanded] = useState(true);
+
+  //Responsive State
+  const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
+
+  //Responsive useEffect
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  //Breakpoint for panel
+  const isMobile = windowWidth <= 768;
+  const isTablet = windowWidth > 768 && windowWidth <= 1024;
+
   const emotions = [
     { key: 'tranquil', label: 'Tranquil', color: '#9DA2C0' },
     { key: 'grounded', label: 'Grounded', color: '#715623' },
@@ -1185,8 +1310,8 @@ function ExpandableInstructionPanel({ onFilterChange, activeFilters, onPrivacyPo
   return (
     <div style={{
       position: 'absolute',
-      bottom: '30px',
-      left: '30px',
+      bottom: isMobile ? '20px' : '30px',
+      left: isMobile ? '15px' : '30px',
       zIndex: 1000,
       fontFamily: 'Space Mono, monospace'
     }}>
@@ -1194,9 +1319,9 @@ function ExpandableInstructionPanel({ onFilterChange, activeFilters, onPrivacyPo
       {isExpanded && (
         <div style={{
           backgroundColor: 'black',
-          borderRadius: '40px',
-          padding: '30px',
-          width: '400px',
+          borderRadius: isMobile ? '30px' : '40px',
+          padding: isMobile ? '25px 20px' : isTablet ? '28x 25x' :'30px',
+          width: isMobile ? '350px' : isTablet ? '380px' : '400px',
           boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
           marginBottom: '5px',
           position: 'relative'
@@ -1424,6 +1549,21 @@ export default function Map() {
   // NEW: Privacy Policy state
   const [showPrivacyPolicy, setShowPrivacyPolicy] = useState(false);
 
+  //Responsive state
+  const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
+  
+  //Responsive useEffect
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  //Breakpoint Definition
+  const isMobile = windowWidth <= 768;
+  const isTablet = windowWidth > 768 && windowWidth <= 1024;
+  const isDesktop = windowWidth > 1024;
+
   useEffect(() => {
     if (!mapContainer.current) return;
 
@@ -1521,8 +1661,9 @@ export default function Map() {
 
       const svgFile = categorySVGs[story.category] || '/pin-orange.svg';
       
-      el.style.width = '60px';
-      el.style.height = '60px';
+      const markerSize = isMobile ? '50px' : '60px';
+      el.style.width = markerSize;
+      el.style.height = markerSize;
       el.style.backgroundImage = `url(${svgFile})`;
       el.style.backgroundSize = 'contain';
       el.style.backgroundRepeat = 'no-repeat';
@@ -1593,8 +1734,9 @@ export default function Map() {
     
     // Create custom marker element
     const el = document.createElement('div');
-    el.style.width = '60px';
-    el.style.height = '60px';
+    const markerSize = isMobile ? '50px' : '60px';
+    el.style.width = markerSize;
+    el.style.height = markerSize;
     el.style.backgroundImage = 'url(/pin-icon.svg)';
     el.style.backgroundSize = 'contain';
     el.style.backgroundRepeat = 'no-repeat';
@@ -1688,9 +1830,9 @@ export default function Map() {
         top: 0,
         left: 0,
         right: 0,
-        padding: '28px 35.5px',
+        padding: isMobile ? '20px 20px' : isTablet ? '25px 30px' : '28px 35.5px',
         display: 'flex',
-        justifyContent: 'flex-end',
+        justifyContent: isMobile ? 'center' : 'flex-end',
         alignItems: 'center',
         backgroundColor: 'transparent',
         zIndex: 1000
@@ -1701,18 +1843,20 @@ export default function Map() {
         borderRadius: '25px',
         backdropFilter: 'blur(10px)', // Background blur effect
         WebkitBackdropFilter: 'blur(10px)', // Safari support
-        padding: '12px 24px',
+        padding: isMobile ? '10px 20px' : '12px 24px',
         boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
         display: 'flex',
-        gap: '40px',
-        alignItems: 'center'
+        gap: isMobile ? '20px' : '40px',
+        alignItems: 'center',
+        flexWrap: isMobile ? 'wrap' : 'nowrap', // ADDED
+        justifyContent: 'center' // ADDED
       }}>
           <Link 
             to="/" 
             style={{
               textDecoration: 'none',
               color: '#2c2c2c',
-              fontSize: '16px',
+              fontSize: isMobile ? '14px' : '16px',
               fontWeight: '400',
               fontFamily: 'Space Mono, monospace',
               transition: 'opacity 0.3s ease'
@@ -1727,7 +1871,7 @@ export default function Map() {
             style={{
               textDecoration: 'none',
               color: '#2c2c2c',
-              fontSize: '16px',
+              fontSize: isMobile ? '14px' : '16px',
               fontWeight: '400',
               fontFamily: 'Space Mono, monospace',
               transition: 'opacity 0.3s ease'
@@ -1745,7 +1889,7 @@ export default function Map() {
             style={{
               textDecoration: 'none',
               color: '#2c2c2c',
-              fontSize: '16px',
+              fontSize: isMobile ? '14px' : '16px',
               fontWeight: '400',
               fontFamily: 'Space Mono, monospace',
               transition: 'opacity 0.3s ease'
