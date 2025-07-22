@@ -216,7 +216,7 @@ const humanPos = getHumanPositions();
         top: 0,
         left: 0,
         right: 0,
-        padding: isMobile ? '20px 20px' : isTablet ? '30px 40px' : '40px 60px',
+        padding: isMobile ? '30px 20px' : isTablet ? '30px 40px' : '40px 60px',
         display: 'flex',
         justifyContent: isMobile ? 'center' : 'flex-end',
         alignItems: 'center',
