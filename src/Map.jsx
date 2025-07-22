@@ -1347,7 +1347,7 @@ function ExpandableInstructionPanel({ onFilterChange, activeFilters, onPrivacyPo
           {/* Main Heading */}
           <h2 style={{
             color: 'white',
-            fontSize: isMobile ? '14px' : '18px',
+            fontSize:'18px',
             fontWeight: '700',
             margin: '0 0 6px 0',
             lineHeight: '1.3'
@@ -1358,7 +1358,7 @@ function ExpandableInstructionPanel({ onFilterChange, activeFilters, onPrivacyPo
           {/* Subtext */}
           <p style={{
             color: 'white',
-            fontSize: isMobile ? '11px' : '14px',
+            fontSize:'14px',
             margin: '0 0 20px 0',
             lineHeight: '1.4'
           }}>
@@ -1375,7 +1375,7 @@ function ExpandableInstructionPanel({ onFilterChange, activeFilters, onPrivacyPo
           {/* Explore by emotion heading */}
           <h3 style={{
             color: 'white',
-            fontSize: isMobile ? '12px' : '16px',
+            fontSize:'16px',
             fontWeight: '600',
             margin: '0 0 15px 0'
           }}>
