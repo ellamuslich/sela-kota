@@ -13,18 +13,31 @@ export default function Homepage() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [scrollY, setScrollY] = useState(0);
   const [hoveredMarker, setHoveredMarker] = useState(null);
+  const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
   const fullText = "Add your story. Find a new one.\nDiscover Jakarta, in between.";
+
+  // Responsive breakpoints
+  const isMobile = windowWidth <= 768;
+  const isTablet = windowWidth > 768 && windowWidth <= 1024;
+  const isDesktop = windowWidth > 1024;
 
   useEffect(() => {
     if (currentIndex < fullText.length) {
       const timeout = setTimeout(() => {
         setDisplayedText(prev => prev + fullText[currentIndex]);
         setCurrentIndex(prev => prev + 1);
-      }, 50); // Adjust speed here (lower = faster)
+      }, 50);
 
       return () => clearTimeout(timeout);
     }
   }, [currentIndex, fullText]);
+
+  // Handle window resize
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Scroll animation effect
   useEffect(() => {
@@ -33,28 +46,138 @@ export default function Homepage() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Calculate cityscape size based on scroll
-  const cityscapeScale = Math.min(0.7 + scrollY * 0.001, 1);
-  const cityscapeOpacity = Math.min(1 + scrollY * 0.001, 1);
+  // Responsive scroll thresholds
+  const getScrollThresholds = () => {
+    if (isMobile) {
+      return {
+        markersThreshold: 800,
+        humansThreshold: 1200,
+        humansFadeStart: 1400
+      };
+    } else if (isTablet) {
+      return {
+        markersThreshold: 900,
+        humansThreshold: 2000,
+        humansFadeStart: 2000
+      };
+    }
+    return {
+      markersThreshold: 1000,
+      humansThreshold: 1600,
+      humansFadeStart: 1600
+    };
+  };
+
+  const { markersThreshold, humansThreshold, humansFadeStart } = getScrollThresholds();
+
+  // Calculate cityscape size based on scroll - responsive version
+  const getInitialScale = () => {
+    if (isMobile || isTablet) {
+      return 1.0; // Start at 100% for mobile and tablet
+    }
+    return 0.7; // Start at 70% for desktop
+  };
+
+  const getMaxScale = () => {
+    if (isMobile || isTablet) {
+      return 1.3; // Zoom to 130% for mobile and tablet
+    }
+    return 1.0; // Max 100% for desktop
+  };
+
+const cityscapeScale = Math.min(getInitialScale() + scrollY * 0.001, getMaxScale());
+const cityscapeOpacity = Math.min(1 + scrollY * 0.001, 1);
   
   // Calculate different phases based on scroll
-  const showMarkers = scrollY > 1000; // Show markers after scrolling past second section
-  const showHumans = scrollY > 1600; // Show humans and start dissolving cityscape
+  const showMarkers = scrollY > markersThreshold;
+  const showHumans = scrollY > humansThreshold;
   const cityscapeTransform = `translateX(-50%) scale(${cityscapeScale})`;
   
   // Calculate cityscape dissolution - starts fading when humans appear
-  const cityscapeDisplayOpacity = showHumans ? Math.max(0, 1 - (scrollY - 1600) / 400) : cityscapeOpacity;
+  const cityscapeDisplayOpacity = showHumans ? Math.max(0, 1 - (scrollY - humansFadeStart) / 400) : cityscapeOpacity;
   
-  // Marker positions (your original positions)
-  const markers = [
-    { id: 1, x: '5%', y: '58%', color: '#EBBDD9' },
-    { id: 2, x: '17%', y: '15%', color: '#EBBDD9' },
-    { id: 3, x: '31%', y: '55%', color: '#EBBDD9' },
-    { id: 4, x: '48%', y: '70%', color: '#EBBDD9' },
-    { id: 5, x: '60%', y: '42%', color: '#EBBDD9' },
-    { id: 6, x: '73%', y: '36%', color: '#EBBDD9' },
-    { id: 7, x: '92%', y: '20%', color: '#EBBDD9' }
-  ];
+  // Responsive marker positions
+  const getMarkers = () => {
+    if (isMobile) {
+      // Fewer markers for mobile, better positioned
+      return [
+        { id: 1, x: '19%', y: '3%', color: '#EBBDD9' },
+        { id: 2, x: '33%', y: '40%', color: '#EBBDD9' },
+        { id: 3, x: '60%', y: '34%', color: '#EBBDD9' },
+        { id: 4, x: '80%', y: '-15%', color: '#EBBDD9' }
+      ];
+    } else if (isTablet) {
+      return [
+        { id: 1, x: '15%', y: '15%', color: '#EBBDD9' },
+        { id: 2, x: '31%', y: '49%', color: '#EBBDD9' },
+        { id: 3, x: '48.5%', y: '70%', color: '#EBBDD9' },
+        { id: 4, x: '65%', y: '35%', color: '#EBBDD9' },
+        { id: 5, x: '87%', y: '18%', color: '#EBBDD9' }
+      ];
+    }
+    // Desktop (original)
+    return [
+      { id: 1, x: '5%', y: '58%', color: '#EBBDD9' },
+      { id: 2, x: '17%', y: '15%', color: '#EBBDD9' },
+      { id: 3, x: '31%', y: '55%', color: '#EBBDD9' },
+      { id: 4, x: '48%', y: '70%', color: '#EBBDD9' },
+      { id: 5, x: '60%', y: '42%', color: '#EBBDD9' },
+      { id: 6, x: '73%', y: '36%', color: '#EBBDD9' },
+      { id: 7, x: '92%', y: '20%', color: '#EBBDD9' }
+    ];
+  };
+
+  const markers = getMarkers();
+
+  //Responsive human illustrations
+  const getHumanPositions = () => {
+    if (isMobile) {
+      return {
+      human1: { left: '-15%', bottom: '20%', height: '260px' },
+      human2: { left: '13%', bottom: '30%', height: '160px' },
+      human3: { left: '35%', bottom: '10%', height: '180px' },
+      human4: { left: '60%', bottom: '40%', height: '220px' }
+    };
+  } else if (isTablet) {
+    return {
+      human1: { left: '-10%', bottom: '4%', height: '380px' },
+      human2: { left: '10%', bottom: '3%', height: '230px' },
+      human3: { left: '47%', bottom: '5%', height: '260px' },
+      human4: { left: '80%', bottom: '15%', height: '310px' }
+    };
+  }
+  // Desktop (original positions)
+  return {
+    human1: { left: '-8%', bottom: '4%', height: '500px' },
+    human2: { left: '13%', bottom: '3%', height: '290px' },
+    human3: { left: '48%', bottom: '5%', height: '320px' },
+    human4: { left: '80%', bottom: '15%', height: '400px' }
+  };
+};
+
+const humanPos = getHumanPositions();
+
+  //Responsive scroll fade-in
+  const getMarkerFadeSettings = () => {
+    if (isMobile) {
+      return {
+        fadeStart: 2000,    // Markers start fading 500px after humans appear
+        fadeDuration: 300  // Takes 300px to completely fade out
+      };
+    } else if (isTablet) {
+      return {
+        fadeStart: 900,    // Markers start fading 700px after humans appear  
+        fadeDuration: 400  // Takes 400px to completely fade out
+      };
+    }
+    // Desktop
+    return {
+      fadeStart: 900,      // Markers start fading 900px after humans appear
+      fadeDuration: 500    // Takes 500px to completely fade out
+    };
+  };
+
+  const markerFade = getMarkerFadeSettings();
 
   return (
     <div style={{
@@ -69,9 +192,9 @@ export default function Homepage() {
         top: 0,
         left: 0,
         right: 0,
-        padding: '40px 60px',
+        padding: isMobile ? '20px 20px' : isTablet ? '30px 40px' : '40px 60px',
         display: 'flex',
-        justifyContent: 'flex-end',
+        justifyContent: isMobile ? 'center' : 'flex-end',
         alignItems: 'center',
         backgroundColor: scrollY > 100 ? 'rgba(254, 251, 238, 0.9)' : 'transparent',
         backdropFilter: scrollY > 100 ? 'blur(10px)' : 'none',
@@ -81,15 +204,17 @@ export default function Homepage() {
         {/* Navigation Menu */}
         <div style={{
           display: 'flex',
-          gap: '40px',
-          alignItems: 'center'
+          gap: isMobile ? '20px' : '40px',
+          alignItems: 'center',
+          flexWrap: isMobile ? 'wrap' : 'nowrap',
+          justifyContent: 'center'
         }}>
           <a 
             href="/" 
             style={{
               textDecoration: 'none',
               color: '#2c2c2c',
-              fontSize: '16px',
+              fontSize: isMobile ? '14px' : '16px',
               fontWeight: '400',
               transition: 'opacity 0.3s ease'
             }}
@@ -103,7 +228,7 @@ export default function Homepage() {
             style={{
               textDecoration: 'none',
               color: '#2c2c2c',
-              fontSize: '16px',
+              fontSize: isMobile ? '14px' : '16px',
               fontWeight: '400',
               fontFamily: 'Space Mono, monospace',
               transition: 'opacity 0.3s ease'
@@ -120,7 +245,7 @@ export default function Homepage() {
             style={{
               textDecoration: 'none',
               color: '#2c2c2c',
-              fontSize: '16px',
+              fontSize: isMobile ? '14px' : '16px',
               fontWeight: '400',
               transition: 'opacity 0.3s ease'
             }}
@@ -140,7 +265,7 @@ export default function Homepage() {
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '0 40px',
+        padding: isMobile ? '0 20px' : isTablet ? '0 30px' : '0 40px',
         textAlign: 'center',
         position: 'relative',
         overflow: 'hidden'
@@ -150,8 +275,8 @@ export default function Homepage() {
           src="/Sela-kota-logo.svg" 
           alt="Sela Kota" 
           style={{ 
-            width: '300px', 
-            marginBottom: '60px',
+            width: isMobile ? '250px' : isTablet ? '280px' : '300px',
+            marginBottom: isMobile ? '40px' : '60px',
             transform: `translateY(${scrollY * 0.1}px)`,
             transition: 'transform 0.1s ease-out',
             zIndex: 10,
@@ -161,16 +286,16 @@ export default function Homepage() {
         
         {/* Subtitle with Typewriter Animation */}
         <p style={{
-          fontSize: '17px',
+          fontSize: isMobile ? '14px' : isTablet ? '16px' : '17px',
           fontFamily: 'Space Mono, monospace',
           fontWeight: '200',
           color: '#000000',
           margin: '0',
           lineHeight: '1.6',
           letterSpacing: '0px',
-          maxWidth: '600px',
-          marginBottom: '40px',
-          minHeight: '54px',
+          maxWidth: isMobile ? '320px' : isTablet ? '500px' : '600px',
+          marginBottom: isMobile ? '30px' : '40px',
+          minHeight: isMobile ? '45px' : '54px',
           transform: `translateY(${scrollY * 0.05}px)`,
           transition: 'transform 0.1s ease-out',
           zIndex: 10,
@@ -190,11 +315,11 @@ export default function Homepage() {
           href="/map"
           style={{
             display: 'inline-block',
-            padding: '16px 32px',
+            padding: isMobile ? '14px 24px' : '16px 32px',
             backgroundColor: '#2c2c2c',
             color: 'white',
             textDecoration: 'none',
-            fontSize: '16px',
+            fontSize: isMobile ? '14px' : '16px',
             fontWeight: '500',
             borderRadius: '30px',
             transition: 'all 0.3s ease',
@@ -203,7 +328,7 @@ export default function Homepage() {
             transform: `translateY(${scrollY * 0.03}px)`,
             zIndex: 10,
             position: 'relative',
-            marginBottom: '120px'
+            marginBottom: isMobile ? '80px' : isTablet ? '100px' : '120px'
           }}
           onMouseEnter={(e) => {
             e.target.style.backgroundColor = '#EBBDD9';
@@ -214,7 +339,7 @@ export default function Homepage() {
             e.target.style.transform = `translateY(${scrollY * 0.03}px)`;
           }}
         >
-          Explore Sela Kota Jakarta
+          {isMobile ? 'Explore Sela Kota' : 'Explore Sela Kota Jakarta'}
         </a>
 
         {/* Growing Jakarta Cityscape stuck to bottom - dissolves when humans appear */}
@@ -227,7 +352,7 @@ export default function Homepage() {
           opacity: cityscapeDisplayOpacity,
           transition: 'transform 0.3s ease-out, opacity 0.5s ease-out',
           width: '100%',
-          maxWidth: '1200px',
+          maxWidth: isMobile ? '100%' : isTablet ? '900px' : '1200px',
           zIndex: 1,
           pointerEvents: 'none'
         }}>
@@ -242,7 +367,7 @@ export default function Homepage() {
           />
           
           {/* Interactive Markers - also fade out with cityscape */}
-          {showMarkers && !showHumans && markers.map((marker) => (
+          {showMarkers && markers.map((marker) => (
             <div
               key={marker.id}
               style={{
@@ -250,12 +375,19 @@ export default function Homepage() {
                 left: marker.x,
                 top: marker.y,
                 transform: 'translate(-50%, -50%)',
-                width: '62px',
-                height: '70px',
+                width: isMobile ? '45px' : isTablet ? '55px' : '62px',
+                height: isMobile ? '52px' : isTablet ? '62px' : '70px',
                 cursor: 'pointer',
                 pointerEvents: 'auto',
                 zIndex: 10,
-                opacity: showMarkers ? 1 : 0,
+                opacity: (() => {
+                  if (!showMarkers) return 0; // Don't show if markers shouldn't be visible yet
+                  if (scrollY < markerFade.fadeStart) return 1; // Full opacity before fade starts
+
+                  // Calculate fade
+                  const fadeProgress = (scrollY - markerFade.fadeStart) / markerFade.fadeDuration;
+                  return Math.max(0, 1 - fadeProgress); // Fade from 1 to 0
+                })(),
                 transition: 'opacity 0.5s ease, transform 0.3s ease',
                 animation: showMarkers ? `fadeInMarker 0.8s ease ${marker.id * 0.1}s both` : 'none'
               }}
@@ -287,8 +419,8 @@ export default function Homepage() {
             transform: 'translateX(-50%)',
             transformOrigin: 'bottom center',
             width: '100%',
-            maxWidth: '1200px',
-            height: '400px', // Set container height for stacking
+            maxWidth: isMobile ? '100%' : isTablet ? '900px' : '1200px',
+            height: isMobile ? '250px' : isTablet ? '320px' : '400px',
             zIndex: 1,
             pointerEvents: 'none'
           }}>
@@ -298,13 +430,13 @@ export default function Homepage() {
               alt="Person 1" 
               style={{
                 position: 'absolute',
-                bottom: '4%',
-                left: '-8%', // Horizontal position
-                height: '500px',
+                bottom: humanPos.human1.bottom,
+                left: humanPos.human1.left,
+                height: humanPos.human1.height,
                 width: 'auto',
-                zIndex: 2, // Controls stacking order (higher = on top)
-                opacity: Math.min(1, Math.max(0, (scrollY - 1700) / 200)),
-                transform: `translateY(${Math.max(0, 1800 - scrollY) * 0.3}px)`,
+                zIndex: 2,
+                opacity: Math.min(1, Math.max(0, (scrollY - (humansFadeStart + 100)) / 200)),
+                transform: `translateY(${Math.max(0, (humansFadeStart + 200) - scrollY) * 0.3}px)`,
                 transition: 'opacity 0.3s ease, transform 0.3s ease'
               }}
             />
@@ -315,13 +447,13 @@ export default function Homepage() {
               alt="Person 2" 
               style={{
                 position: 'absolute',
-                bottom: '3%',
-                left: '13%', // Overlapping position
-                height: '290px',
+                bottom: humanPos.human2.bottom,
+                left: humanPos.human2.left,
+                height: humanPos.human2.height,
                 width: 'auto',
-                zIndex: 1, // In front of Human 1
-                opacity: Math.min(1, Math.max(0, (scrollY - 1800) / 200)),
-                transform: `translateY(${Math.max(0, 1900 - scrollY) * 0.3}px)`,
+                zIndex: 1,
+                opacity: Math.min(1, Math.max(0, (scrollY - (humansFadeStart + 200)) / 200)),
+                transform: `translateY(${Math.max(0, (humansFadeStart + 300) - scrollY) * 0.3}px)`,
                 transition: 'opacity 0.3s ease, transform 0.3s ease'
               }}
             />
@@ -332,13 +464,13 @@ export default function Homepage() {
               alt="Person 3" 
               style={{
                 position: 'absolute',
-                bottom: '5%',
-                left: '48%', // Overlapping position
-                height: '320px',
+                bottom: humanPos.human3.bottom,
+                left: humanPos.human3.left,
+                height: humanPos.human3.height,
                 width: 'auto',
-                zIndex: 4, // In front of Human 2
-                opacity: Math.min(1, Math.max(0, (scrollY - 1900) / 200)),
-                transform: `translateY(${Math.max(0, 2000 - scrollY) * 0.3}px)`,
+                zIndex: 4,
+                opacity: Math.min(1, Math.max(0, (scrollY - (humansFadeStart + 300)) / 200)),
+                transform: `translateY(${Math.max(0, (humansFadeStart + 400) - scrollY) * 0.3}px)`,
                 transition: 'opacity 0.3s ease, transform 0.3s ease'
               }}
             />
@@ -349,13 +481,13 @@ export default function Homepage() {
               alt="Person 4" 
               style={{
                 position: 'absolute',
-                bottom: '15%',
-                left: '80%', // Overlapping position
-                height: '400px',
+                bottom: humanPos.human4.bottom,
+                left: humanPos.human4.left,
+                height: humanPos.human4.height,
                 width: 'auto',
-                zIndex: 3, // On top of all others
-                opacity: Math.min(1, Math.max(0, (scrollY - 1700) / 200)), // ← Same as Human 1: appears at 1700px
-                transform: `translateY(${Math.max(0, 1800 - scrollY) * 0.3}px)`, // ← Same timing as Human 1
+                zIndex: 3,
+                opacity: Math.min(1, Math.max(0, (scrollY - (humansFadeStart + 100)) / 200)),
+                transform: `translateY(${Math.max(0, (humansFadeStart + 200) - scrollY) * 0.3}px)`,
                 transition: 'opacity 0.3s ease, transform 0.3s ease'
               }}
             />
@@ -383,38 +515,42 @@ export default function Homepage() {
           `}
         </style>
 
-        {/* Subtle decorative elements */}
-        <div style={{
-          position: 'absolute',
-          top: '20%',
-          left: '10%',
-          width: '2px',
-          height: '100px',
-          backgroundColor: '#ddd',
-          opacity: '0.3',
-          transform: `translateY(${scrollY * 0.2}px)`,
-          transition: 'transform 0.1s ease-out',
-          zIndex: 5
-        }}></div>
-        
-        <div style={{
-          position: 'absolute',
-          bottom: '20%',
-          right: '15%',
-          width: '60px',
-          height: '2px',
-          backgroundColor: '#ddd',
-          opacity: '0.3',
-          transform: `translateX(${scrollY * -0.1}px)`,
-          transition: 'transform 0.1s ease-out',
-          zIndex: 5
-        }}></div>
+        {/* Subtle decorative elements - hide on mobile */}
+        {!isMobile && (
+          <>
+            <div style={{
+              position: 'absolute',
+              top: '20%',
+              left: '10%',
+              width: '2px',
+              height: isTablet ? '80px' : '100px',
+              backgroundColor: '#ddd',
+              opacity: '0.3',
+              transform: `translateY(${scrollY * 0.2}px)`,
+              transition: 'transform 0.1s ease-out',
+              zIndex: 5
+            }}></div>
+            
+            <div style={{
+              position: 'absolute',
+              bottom: '20%',
+              right: '15%',
+              width: isTablet ? '50px' : '60px',
+              height: '2px',
+              backgroundColor: '#ddd',
+              opacity: '0.3',
+              transform: `translateX(${scrollY * -0.1}px)`,
+              transition: 'transform 0.1s ease-out',
+              zIndex: 5
+            }}></div>
+          </>
+        )}
       </section>
 
       {/* Second Section with New Text */}
       <section style={{
         backgroundColor: 'transparent',
-        padding: '100px 40px 200px',
+        padding: isMobile ? '60px 20px 120px' : isTablet ? '80px 30px 160px' : '100px 40px 200px',
         position: 'relative',
         zIndex: 10,
         minHeight: '50vh',
@@ -424,22 +560,22 @@ export default function Homepage() {
       }}>
         <div style={{
           textAlign: 'center',
-          maxWidth: '800px',
+          maxWidth: isMobile ? '320px' : isTablet ? '600px' : '800px',
           margin: '0 auto',
           transform: `translateY(${Math.max(0, (scrollY - 300) * -0.1) - 100}px)`,
           opacity: Math.min(1, Math.max(0, (scrollY - 298) / 300)),
           transition: 'transform 0.1s ease-out, opacity 0.1s ease-out'
         }}>
           <p style={{
-            fontSize: '16px',
+            fontSize: isMobile ? '14px' : '16px',
             lineHeight: '1.8',
             color: '#2c2c2c',
             fontFamily: 'Space Mono, monospace',
             fontWeight: '400',
             marginBottom: '0'
           }}>
-            Too often, Jakarta is defined by the hustle and bustle<br/>
-            — the concrete jungle, the noise, the blinding lights.<br/>
+            Too often, Jakarta is defined by the hustle and bustle{isMobile ? ' ' : <br/>}
+            — the concrete jungle, the noise, the blinding lights.{isMobile ? ' ' : <br/>}
             It's loud, fast, and always moving.
           </p>
         </div>
@@ -448,7 +584,7 @@ export default function Homepage() {
       {/* Third Section with Interactive Map Text */}
       <section style={{
         backgroundColor: 'transparent',
-        padding: '100px 40px 200px',
+        padding: isMobile ? '60px 20px 120px' : isTablet ? '80px 30px 160px' : '100px 40px 200px',
         position: 'relative',
         zIndex: 10,
         minHeight: '50vh',
@@ -458,21 +594,21 @@ export default function Homepage() {
       }}>
         <div style={{
           textAlign: 'center',
-          maxWidth: '600px',
+          maxWidth: isMobile ? '320px' : isTablet ? '500px' : '600px',
           margin: '0 auto',
           transform: `translateY(${Math.max(0, (scrollY - 800) * -0.1) - 100}px)`,
           opacity: Math.min(1, Math.max(0, (scrollY - 800) / 300)),
           transition: 'transform 0.1s ease-out, opacity 0.1s ease-out'
         }}>
           <p style={{
-            fontSize: '16px',
+            fontSize: isMobile ? '14px' : '16px',
             lineHeight: '1.8',
             color: '#2c2c2c',
             fontFamily: 'Space Mono, monospace',
             fontWeight: '400',
             marginBottom: '0'
           }}>
-            But what happens in the pauses?<br/>
+            But what happens in the pauses?{isMobile ? ' ' : <br/>}
             In the spaces we pass by, but rarely see?
           </p>
         </div>
@@ -481,7 +617,7 @@ export default function Homepage() {
       {/* Fourth Section with Human Stories Text */}
       <section style={{
         backgroundColor: 'transparent',
-        padding: '100px 40px 200px',
+        padding: isMobile ? '60px 20px 120px' : isTablet ? '80px 30px 160px' : '100px 40px 200px',
         position: 'relative',
         zIndex: 10,
         minHeight: '50vh',
@@ -491,24 +627,26 @@ export default function Homepage() {
       }}>
         <div style={{
           textAlign: 'center',
-          maxWidth: '600px',
+          maxWidth: isMobile ? '320px' : isTablet ? '500px' : '600px',
           margin: '0 auto',
           transform: `translateY(${Math.max(0, (scrollY - 1600) * -0.1) - 100}px)`,
           opacity: Math.min(1, Math.max(0, (scrollY - 1600) / 300)),
           transition: 'transform 0.1s ease-out, opacity 0.1s ease-out'
         }}>
           <p style={{
-            fontSize: '16px',
-            lineHeight: '1.8',
-            color: '#2c2c2c',
-            fontFamily: 'Space Mono, monospace',
-            fontWeight: '400',
-            marginBottom: '0'
-          }}>
-            Meaning lives in the in-between. In a quiet warung, a glance<br/>
-            between strangers, a balcony overlooking the sunset.<br/>
-            sela kota exists to bring those overlooked spaces and feelings into view.
-          </p>
+          fontSize: isMobile ? '14px' : '16px',
+          lineHeight: '1.8',
+          color: '#2c2c2c',
+          fontFamily: 'Space Mono, monospace',
+          fontWeight: '400',
+          marginBottom: '0'
+        }}>
+          Meaning lives in the in-between. In a quiet warung, a glance
+          {isMobile ? ' ' : isTablet ? ' ' : <br/>}
+          between strangers, a balcony overlooking the sunset.
+          {isMobile ? ' ' : isTablet ? ' ' : <br/>}
+          sela kota exists to bring those overlooked spaces and feelings into view.
+        </p>
         </div>
       </section>
     </div>
