@@ -28,17 +28,17 @@ document.head.appendChild(fontLink);
 // NEW: Guidelines Modal Component
 function GuidelinesModal({ isOpen, onClose }) {
 
-  //Responsive state
+  //Responsive state - Guidelines Modal
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
 
-  //Responsive useEffect
+  //Responsive useEffect - Guidelines Modal
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  //Breakpoints
+  //Breakpoints - Guidelines Modal
   const isMobile = windowWidth <= 768;
 
   if (!isOpen) return null;
@@ -64,10 +64,10 @@ function GuidelinesModal({ isOpen, onClose }) {
         style={{
           backgroundColor: '#FEFBEE',
           borderRadius: '20px',
-          padding: isMobile ? '25px 15px' : '40px',    // SMALLER padding on mobile
-          maxWidth: isMobile ? '350px' : '600px',      // FIXED width on mobile
-          width: isMobile ? '350px' : '90%',           // FIXED width on mobile
-          maxHeight: '80vh',
+          padding: isMobile ? '25px 15px' : '40px',    
+          maxWidth: isMobile ? '350px' : '600px',      
+          width: isMobile ? '350px' : '90%',           
+          maxHeight: isMobile ? '70vh' : '80vh',
           overflow: 'auto',
           fontFamily: 'Space Mono, monospace',
           position: 'relative',
@@ -230,7 +230,7 @@ function PrivacyPolicyModal({ isOpen, onClose }) {
           padding: isMobile ? '30px 20px' : '40px',
           maxWidth: isMobile ? '100%' : '600px',
           width: '90%',
-          maxHeight: '80vh',
+          maxHeight: isMobile ? '70vh' : '80vh',
           overflow: 'auto',
           fontFamily: 'Space Mono, monospace',
           position: 'relative',
@@ -495,7 +495,7 @@ function StoryForm({ isOpen, onClose, onSave, location }) {
         padding: isMobile ? '25px 20px' : '30px',
         maxWidth: isMobile ? '100%' : '400px',   
         width: '90%',
-        maxHeight: '80vh',
+        maxHeight: isMobile ? '70vh' : '80vh',
         overflow: 'auto',
         fontFamily: 'Space Mono, monospace'
       }}>
@@ -855,7 +855,7 @@ function IndividualStoryViewer({ isOpen, onClose, story }) {
           padding: isMobile ? '25px 20px' : '30px',
           maxWidth: isMobile ? '100%' : '500px', 
           width: '90%',
-          maxHeight: '80vh',
+          maxHeight: isMobile ? '70vh' : '80vh',
           overflow: 'auto',
           fontFamily: 'Space Mono, monospace',
           position: 'relative',
@@ -1347,7 +1347,7 @@ function ExpandableInstructionPanel({ onFilterChange, activeFilters, onPrivacyPo
           {/* Main Heading */}
           <h2 style={{
             color: 'white',
-            fontSize:'18px',
+            fontSize:isMobile ? '16px' : '18px',
             fontWeight: '700',
             margin: '0 0 6px 0',
             lineHeight: '1.3'
@@ -1358,7 +1358,7 @@ function ExpandableInstructionPanel({ onFilterChange, activeFilters, onPrivacyPo
           {/* Subtext */}
           <p style={{
             color: 'white',
-            fontSize:'14px',
+            fontSize: isMobile ? '12px' : '14px',
             margin: '0 0 20px 0',
             lineHeight: '1.4'
           }}>
