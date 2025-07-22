@@ -1369,7 +1369,7 @@ function ExpandableInstructionPanel({ onFilterChange, activeFilters, onPrivacyPo
           <div style={{
             height: '0.25px',
             backgroundColor: 'white',
-            margin: '0 0 25px 0'
+            margin: isMobile ? '0 0 15px 0' : '0 0 25px 0'
           }} />
 
           {/* Explore by emotion heading */}
