@@ -1133,7 +1133,7 @@ function AnimatedSearchBar({
               outline: 'none',
               background: 'none',
               flex: 1,
-              fontSize: isMobile ? '12px' : '14px',
+              fontSize: isMobile ? '16px' : '14px',
               color: '#111827',
               fontFamily: 'Space Mono, monospace',
               opacity: isExpanded ? 1 : 0,
