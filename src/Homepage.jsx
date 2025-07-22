@@ -50,9 +50,9 @@ export default function Homepage() {
   const getScrollThresholds = () => {
     if (isMobile) {
       return {
-        markersThreshold: 600,
-        humansThreshold: 800,
-        humansFadeStart: 1000
+        markersThreshold: 900,
+        humansThreshold: 1000,
+        humansFadeStart: 1200
       };
     } else if (isTablet) {
       return {
@@ -630,7 +630,7 @@ const humanPos = getHumanPositions();
           maxWidth: isMobile ? '320px' : isTablet ? '500px' : '600px',
           margin: '0 auto',
           transform: `translateY(${Math.max(0, (scrollY - 1600) * -0.1) - 100}px)`,
-          opacity: Math.min(1, Math.max(0, (scrollY - 1600) / 300)),
+          opacity: Math.min(1, Math.max(0, (scrollY - 1400) / 300)),
           transition: 'transform 0.1s ease-out, opacity 0.1s ease-out'
         }}>
           <p style={{
