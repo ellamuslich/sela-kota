@@ -1816,7 +1816,7 @@ export default function Map() {
   };
 
   return (
-    <div style={{ position: 'relative', width: '100%', height: '100vh' }}>
+    <div style={{ position: 'relative', width: '100%', height: isMobile ? '100svh' : '100vh' }}>
       <AnimatedSearchBar
         onSearch={handleSearchDebounced}
         onSelectLocation={handleSelectLocation}
@@ -1902,7 +1902,7 @@ export default function Map() {
         </div>
       </nav>
       
-      <div ref={mapContainer} style={{ width: '100%', height: '100vh' }} />
+      <div ref={mapContainer} style={{ width: '100%', height: isMobile ? '100svh' : '100vh' }} />
 
       {/* NEW: Expandable Instruction Panel with Privacy Policy and Guidelines handlers */}
       <ExpandableInstructionPanel
