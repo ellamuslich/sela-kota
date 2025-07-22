@@ -1319,9 +1319,9 @@ function ExpandableInstructionPanel({ onFilterChange, activeFilters, onPrivacyPo
       {isExpanded && (
         <div style={{
           backgroundColor: 'black',
-          borderRadius: isMobile ? '30px' : '40px',
-          padding: isMobile ? '25px 20px' : isTablet ? '28x 25x' :'30px',
-          width: isMobile ? '350px' : isTablet ? '380px' : '400px',
+          borderRadius: isMobile ? '25px' : '40px',
+          padding: isMobile ? '20px 15px' : isTablet ? '28x 25x' :'30px',
+          width: isMobile ? '320px' : isTablet ? '380px' : '400px',
           boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
           marginBottom: '5px',
           position: 'relative'
@@ -1347,9 +1347,9 @@ function ExpandableInstructionPanel({ onFilterChange, activeFilters, onPrivacyPo
           {/* Main Heading */}
           <h2 style={{
             color: 'white',
-            fontSize: '18px',
+            fontSize: isMobile ? '14px' : '18px',
             fontWeight: '700',
-            margin: '0 0 8px 0',
+            margin: '0 0 6px 0',
             lineHeight: '1.3'
           }}>
             Add Your Stories
@@ -1358,9 +1358,9 @@ function ExpandableInstructionPanel({ onFilterChange, activeFilters, onPrivacyPo
           {/* Subtext */}
           <p style={{
             color: 'white',
-            fontSize: '14px',
-            margin: '0 0 30px 0',
-            lineHeight: '1.5'
+            fontSize: isMobile ? '11px' : '14px',
+            margin: '0 0 20px 0',
+            lineHeight: '1.4'
           }}>
             Click anywhere on the map to share your experience and discover Sela Kota!
           </p>
@@ -1375,9 +1375,9 @@ function ExpandableInstructionPanel({ onFilterChange, activeFilters, onPrivacyPo
           {/* Explore by emotion heading */}
           <h3 style={{
             color: 'white',
-            fontSize: '16px',
+            fontSize: isMobile ? '12px' : '16px',
             fontWeight: '600',
-            margin: '0 0 20px 0'
+            margin: '0 0 15px 0'
           }}>
             Explore by emotion!
           </h3>
@@ -1386,8 +1386,8 @@ function ExpandableInstructionPanel({ onFilterChange, activeFilters, onPrivacyPo
           <div style={{
             display: 'flex',
             flexWrap: 'wrap',
-            gap: '12px',
-            marginBottom: '30px'
+            gap: isMobile ? '6px' : '12px',
+            marginBottom: isMobile ? '20px' : '30px'
           }}>
             {emotions.map((emotion) => (
               <button
