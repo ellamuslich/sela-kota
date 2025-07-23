@@ -450,8 +450,8 @@ function StoryForm({ isOpen, onClose, onSave, location }) {
         title: title.trim(),
         content: content.trim(),
         category,
-        lat: location.lat,
-        lng: location.lng,
+        latitude: location.lat,
+        longitude: location.lng,
         timestamp: new Date().toISOString(),
         mediaFiles: mediaFiles.map(({ file, preview, type, name }) => ({ 
           preview, 
@@ -985,7 +985,7 @@ function IndividualStoryViewer({ isOpen, onClose, story }) {
             color: '#6B7280',
             textAlign: 'right',
           }}>
-            {new Date(story.timestamp).toLocaleDateString('en-GB', {
+            {new Date(story.created_at).toLocaleDateString('en-GB', {
               year: 'numeric',
               month: 'long',
               day: 'numeric'
@@ -1552,6 +1552,45 @@ export default function Map() {
   //Responsive state
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
   
+  // API functions
+  const fetchStories = async () => {
+    try {
+      const response = await fetch('http://localhost:3001/api/stories');
+      const stories = await response.json();
+
+      // Map database columns to React code expectations
+      const mappedStories = stories.map(story => ({
+        ...story,
+        lat: story.latitude,   // Map latitude -> lat
+        lng: story.longitude   // Map longitude -> lng
+      }));
+
+      setUserStories(mappedStories);
+    } catch (error) {
+      console.error('Error fetching stories:', error);
+    }
+  };
+
+  const saveStoryToAPI = async (story) => {
+    try {
+      const response = await fetch('http://localhost:3001/api/stories', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(story)
+      });
+      
+      const result = await response.json();
+      console.log('Story saved:', result);
+      
+      // Refresh stories from database
+      fetchStories();
+    } catch (error) {
+      console.error('Error saving story:', error);
+    }
+  };
+
   //Responsive useEffect
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
@@ -1608,8 +1647,11 @@ export default function Map() {
 
     mapRef.current = map;
 
+    // Fetch initial stories from API
+    fetchStories();
+
     return () => map.remove();
-  }, [userStories]);
+  }, []);
 
   // NEW: Filter handler function
   const handleFilterChange = (emotionKey) => {
@@ -1774,7 +1816,7 @@ export default function Map() {
     const currentCenter = mapRef.current.getCenter();
     const currentZoom = mapRef.current.getZoom();
     
-    setUserStories(prev => [...prev, story]);
+    saveStoryToAPI(story);
     
     // Ensure map stays at the story location after saving
     setTimeout(() => {
