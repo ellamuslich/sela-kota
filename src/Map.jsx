@@ -1555,7 +1555,7 @@ export default function Map() {
   // API functions
   const fetchStories = async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/stories');
+      const response = await fetch('https://sela-kota-backend.onrender.com/api/stories');
       const stories = await response.json();
 
       // Map database columns to React code expectations
@@ -1573,7 +1573,7 @@ export default function Map() {
 
   const saveStoryToAPI = async (story) => {
     try {
-      const response = await fetch('http://localhost:3001/api/stories', {
+      const response = await fetch('https://sela-kota-backend.onrender.com/api/stories', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
