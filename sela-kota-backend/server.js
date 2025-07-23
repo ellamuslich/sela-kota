@@ -1,5 +1,5 @@
 const express = require('express');
-const mysql = require('mysql2');
+const { Pool } = require('pg');
 const cors = require('cors');
 require('dotenv').config();
 
@@ -16,19 +16,18 @@ app.use(cors({
 app.use(express.json());
 
 // Database connection
-const db = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: '', // Empty password for local MySQL
-  database: 'sela_kota'
+const db = new Pool({
+  connectionString: process.env.DATABASE_URL || 'postgresql://username:password@localhost/sela_kota',
+  ssl: { rejectUnauthorized: false }
 });
 
 // Test database connection
-db.connect((err) => {
+db.connect((err, client, release) => {
   if (err) {
     console.error('Database connection failed:', err);
   } else {
-    console.log('Connected to MySQL database!');
+    console.log('Connected to PostgreSQL database!');
+    release();
   }
 });
 
@@ -38,34 +37,32 @@ app.get('/', (req, res) => {
 });
 
 // Get all stories
-app.get('/api/stories', (req, res) => {
-  const query = 'SELECT * FROM stories ORDER BY created_at DESC';
-  db.query(query, (err, results) => {
-    if (err) {
-      res.status(500).json({ error: err.message });
-    } else {
-      res.json(results);
-    }
-  });
+app.get('/api/stories', async (req, res) => {
+  try {
+    const result = await db.query('SELECT * FROM stories ORDER BY created_at DESC');
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // Create new story
-app.post('/api/stories', (req, res) => {
-  console.log('POST request received:', req.body);
+app.post('/api/stories', async (req, res) => {
   const { title, content, category, latitude, longitude } = req.body;
   
-  const query = 'INSERT INTO stories (title, content, category, latitude, longitude) VALUES (?, ?, ?, ?, ?)';
-  
-  db.query(query, [title, content, category, latitude, longitude], (err, result) => {
-    if (err) {
-      res.status(500).json({ error: err.message });
-    } else {
-      res.json({ 
-        id: result.insertId, 
-        message: 'Story created successfully!' 
-      });
-    }
-  });
+  try {
+    const result = await db.query(
+      'INSERT INTO stories (title, content, category, latitude, longitude) VALUES ($1, $2, $3, $4, $5) RETURNING id',
+      [title, content, category, latitude, longitude]
+    );
+    
+    res.json({ 
+      id: result.rows[0].id, 
+      message: 'Story created successfully!' 
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // Start server

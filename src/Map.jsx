@@ -1812,6 +1812,20 @@ export default function Map() {
 
   // Save story handler that preserves map position
   const handleSaveStory = (story) => {
+    // Add story to local state immediately (optimistic update)
+    const newStory = {
+      ...story,
+      id: Date.now(), // Temporary ID
+      created_at: new Date().toISOString(),
+      lat: story.latitude,
+      lng: story.longitude
+    };
+    
+    setUserStories(prev => [newStory, ...prev]); // Add immediately
+    
+    // Then save to database in background
+    saveStoryToAPI(story);
+
     // Store current map center and zoom before saving
     const currentCenter = mapRef.current.getCenter();
     const currentZoom = mapRef.current.getZoom();
