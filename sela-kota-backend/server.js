@@ -8,7 +8,14 @@ const PORT = 3001;
 
 // Middleware
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:3000', 'http://localhost:5174', 'http://localhost:3001'],
+  origin: [
+    'http://localhost:5173', 
+    'http://localhost:3000', 
+    'http://localhost:5174', 
+    'http://localhost:3001',
+    'https://sela-kota.vercel.app',           // Add your Vercel domain
+    'https://sela-kota-jmtgvyjx-ella-muslichs-projects.vercel.app' // Add your preview domain
+  ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization']
