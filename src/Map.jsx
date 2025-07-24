@@ -27,6 +27,10 @@ document.head.appendChild(fontLink);
 
 // ADD CLOUDINARY UPLOAD FUNCTION HERE:
 const uploadToCloudinary = async (file) => {
+  console.log('Uploading file:', file.name); // Debug log
+  console.log('Cloud name:', import.meta.env.VITE_CLOUDINARY_CLOUD_NAME); // Debug log
+  console.log('Upload preset:', import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET); // Debug log
+
   const formData = new FormData();
   formData.append('file', file);
   formData.append('upload_preset', import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET);
@@ -41,7 +45,14 @@ const uploadToCloudinary = async (file) => {
     );
     
     const data = await response.json();
-    return data.secure_url; // Returns the permanent URL
+    console.log('Cloudinary response:', data); // Debug log
+    
+    if (data.secure_url) {
+      return data.secure_url;
+    } else {
+      console.error('No secure_url in response:', data);
+      throw new Error('Upload failed - no URL returned');
+    }
   } catch (error) {
     console.error('Upload failed:', error);
     throw error;
@@ -992,7 +1003,7 @@ function IndividualStoryViewer({ isOpen, onClose, story }) {
             ))}
           </div>
         )}
-        
+
         {/* Footer with Timestamp and Location */}
         <div style={{ 
           borderTop: '1px solid #E5E7EB',
