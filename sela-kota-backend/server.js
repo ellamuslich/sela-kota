@@ -48,18 +48,46 @@ app.get('/api/stories', async (req, res) => {
   try {
     const result = await db.query('SELECT *, media_urls FROM stories ORDER BY created_at DESC');
     
-    // Map media_urls back to mediaFiles format
-    const stories = result.rows.map(story => ({
-      ...story,
-      mediaFiles: story.media_urls ? story.media_urls.map(url => ({
-        type: url.includes('video') ? 'video' : 'image',
-        url: url,
-        name: 'uploaded_file'
-      })) : []
-    }));
+    // Map media_urls back to mediaFiles format with better handling
+    const stories = result.rows.map(story => {
+      let mediaFiles = [];
+      
+      // Handle different formats of media_urls from PostgreSQL
+      if (story.media_urls) {
+        if (Array.isArray(story.media_urls)) {
+          // Already an array
+          mediaFiles = story.media_urls.map(url => ({
+            type: (url && url.includes('video')) ? 'video' : 'image',
+            url: url,
+            name: 'uploaded_file'
+          }));
+        } else if (typeof story.media_urls === 'string') {
+          // PostgreSQL might return as string, try to parse
+          try {
+            const parsed = JSON.parse(story.media_urls);
+            if (Array.isArray(parsed)) {
+              mediaFiles = parsed.map(url => ({
+                type: (url && url.includes('video')) ? 'video' : 'image',
+                url: url,
+                name: 'uploaded_file'
+              }));
+            }
+          } catch (e) {
+            // If parsing fails, treat as empty array
+            mediaFiles = [];
+          }
+        }
+      }
+      
+      return {
+        ...story,
+        mediaFiles: mediaFiles
+      };
+    });
     
     res.json(stories);
   } catch (err) {
+    console.error('Database error:', err);
     res.status(500).json({ error: err.message });
   }
 });
