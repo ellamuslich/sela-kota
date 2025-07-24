@@ -46,8 +46,19 @@ app.get('/', (req, res) => {
 // Get all stories
 app.get('/api/stories', async (req, res) => {
   try {
-    const result = await db.query('SELECT * FROM stories ORDER BY created_at DESC');
-    res.json(result.rows);
+    const result = await db.query('SELECT *, media_urls FROM stories ORDER BY created_at DESC');
+    
+    // Map media_urls back to mediaFiles format
+    const stories = result.rows.map(story => ({
+      ...story,
+      mediaFiles: story.media_urls ? story.media_urls.map(url => ({
+        type: url.includes('video') ? 'video' : 'image',
+        url: url,
+        name: 'uploaded_file'
+      })) : []
+    }));
+    
+    res.json(stories);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -55,12 +66,15 @@ app.get('/api/stories', async (req, res) => {
 
 // Create new story
 app.post('/api/stories', async (req, res) => {
-  const { title, content, category, latitude, longitude } = req.body;
+  const { title, content, category, latitude, longitude, mediaFiles } = req.body;
+  
+  // Extract URLs from mediaFiles
+  const mediaUrls = mediaFiles ? mediaFiles.map(file => file.url) : [];
   
   try {
     const result = await db.query(
-      'INSERT INTO stories (title, content, category, latitude, longitude) VALUES ($1, $2, $3, $4, $5) RETURNING id',
-      [title, content, category, latitude, longitude]
+      'INSERT INTO stories (title, content, category, latitude, longitude, media_urls) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id',
+      [title, content, category, latitude, longitude, mediaUrls]
     );
     
     res.json({ 

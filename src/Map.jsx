@@ -25,6 +25,29 @@ fontLink.href = 'https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;70
 fontLink.rel = 'stylesheet';
 document.head.appendChild(fontLink);
 
+// ADD CLOUDINARY UPLOAD FUNCTION HERE:
+const uploadToCloudinary = async (file) => {
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('upload_preset', import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET);
+
+  try {
+    const response = await fetch(
+      `https://api.cloudinary.com/v1_1/${import.meta.env.VITE_CLOUDINARY_CLOUD_NAME}/upload`,
+      {
+        method: 'POST',
+        body: formData
+      }
+    );
+    
+    const data = await response.json();
+    return data.secure_url; // Returns the permanent URL
+  } catch (error) {
+    console.error('Upload failed:', error);
+    throw error;
+  }
+};
+
 // NEW: Guidelines Modal Component
 function GuidelinesModal({ isOpen, onClose }) {
 
@@ -444,30 +467,42 @@ function StoryForm({ isOpen, onClose, onSave, location }) {
     });
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (title.trim() && content.trim() && category) {
-      onSave({
-        title: title.trim(),
-        content: content.trim(),
-        category,
-        latitude: location.lat,
-        longitude: location.lng,
-        timestamp: new Date().toISOString(),
-        mediaFiles: mediaFiles.map(({ file, preview, type, name }) => ({ 
-          preview, 
-          type, 
-          name,
-          file // In a real app, you'd upload this to a server
-        })),
-        id: Date.now() + Math.random() // Ensure unique IDs
-      });
-      
-      // Reset form
-      setTitle('');
-      setContent('');
-      setCategory('');
-      setMediaFiles([]);
-      onClose();
+      try {
+        // Upload all media files to Cloudinary first
+        const uploadedMediaFiles = await Promise.all(
+          mediaFiles.map(async (media) => {
+            const cloudinaryUrl = await uploadToCloudinary(media.file);
+            return {
+              type: media.type,
+              name: media.name,
+              url: cloudinaryUrl // Permanent Cloudinary URL
+            };
+          })
+        );
+
+        onSave({
+          title: title.trim(),
+          content: content.trim(),
+          category,
+          latitude: location.lat,
+          longitude: location.lng,
+          timestamp: new Date().toISOString(),
+          mediaFiles: uploadedMediaFiles, // Now using permanent URLs
+          id: Date.now() + Math.random()
+        });
+
+        // Reset form
+        setTitle('');
+        setContent('');
+        setCategory('');
+        setMediaFiles([]);
+        onClose();
+      } catch (error) {
+        console.error('Error uploading files:', error);
+        alert('Error uploading files. Please try again.');
+      }
     }
   };
 
