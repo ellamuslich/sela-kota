@@ -967,7 +967,7 @@ function IndividualStoryViewer({ isOpen, onClose, story }) {
               }}>
                 {media.type === 'image' ? (
                   <img 
-                    src={media.preview} 
+                    src={media.url} 
                     alt={`Media ${index + 1}`}
                     style={{ 
                       width: '100%', 
@@ -975,11 +975,11 @@ function IndividualStoryViewer({ isOpen, onClose, story }) {
                       objectFit: 'cover',
                       cursor: 'pointer'
                     }}
-                    onClick={() => window.open(media.preview, '_blank')}
+                    onClick={() => window.open(media.url, '_blank')}
                   />
                 ) : (
                   <video 
-                    src={media.preview} 
+                    src={media.url} 
                     controls
                     style={{ 
                       width: '100%', 
@@ -992,7 +992,7 @@ function IndividualStoryViewer({ isOpen, onClose, story }) {
             ))}
           </div>
         )}
-
+        
         {/* Footer with Timestamp and Location */}
         <div style={{ 
           borderTop: '1px solid #E5E7EB',
