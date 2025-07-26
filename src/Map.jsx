@@ -1654,6 +1654,19 @@ export default function Map() {
   const isTablet = windowWidth > 768 && windowWidth <= 1024;
   const isDesktop = windowWidth > 1024;
 
+  // Create refs to access current values in the map click handler
+  const userStoriesRef = useRef(userStories);
+  const currentMarkerRef = useRef(currentMarker);
+
+  // Update refs when values change
+  useEffect(() => {
+    userStoriesRef.current = userStories;
+  }, [userStories]);
+
+  useEffect(() => {
+    currentMarkerRef.current = currentMarker;
+  }, [currentMarker]);
+
   useEffect(() => {
     if (!mapContainer.current) return;
 
@@ -1677,8 +1690,12 @@ export default function Map() {
     map.on('click', (e) => {
       const { lng, lat } = e.lngLat;
       
+      // Use refs to get current values
+      const currentUserStories = userStoriesRef.current;
+      const currentMarkerValue = currentMarkerRef.current;
+
       // Check if click is very close to an existing story (within small radius)
-      const clickedStory = userStories.find(story => {
+      const clickedStory = currentUserStories.find(story => {
         const distance = Math.sqrt(
           Math.pow(story.lat - lat, 2) + Math.pow(story.lng - lng, 2)
         );
@@ -1686,16 +1703,22 @@ export default function Map() {
       });
       
       if (clickedStory) {
+        // Remove search marker when clicking on a story
+        if (currentMarkerValue) {
+          currentMarkerValue.remove();
+          setCurrentMarker(null);
+        }
+
         // Show individual story
         setSelectedStory(clickedStory);
         setShowStoryViewer(true);
       } else {
         // Remove existing search marker when clicking elsewhere
-        if (currentMarker) {
-          currentMarker.remove();
+        if (currentMarkerValue) {
+          currentMarkerValue.remove();
           setCurrentMarker(null);
         }
-        
+
         // Add new story at this location
         setSelectedLocation({ lat, lng });
         setShowStoryForm(true);
@@ -1707,7 +1730,7 @@ export default function Map() {
     // Fetch initial stories from API
     fetchStories();
 
-    return () => map.remove();
+      return () => map.remove();
   }, []);
 
   // NEW: Filter handler function
