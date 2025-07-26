@@ -434,6 +434,7 @@ function StoryForm({ isOpen, onClose, onSave, location }) {
   const [category, setCategory] = useState('');
   const [mediaFiles, setMediaFiles] = useState([]);
   const fileInputRef = useRef(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   //Responsive State-Story Form
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
@@ -479,7 +480,8 @@ function StoryForm({ isOpen, onClose, onSave, location }) {
   };
 
   const handleSave = async () => {
-    if (title.trim() && content.trim() && category) {
+    if (title.trim() && content.trim() && category && !isLoading) {
+      setIsLoading(true); // Start loading
       try {
         // Upload all media files to Cloudinary first
         const uploadedMediaFiles = await Promise.all(
@@ -513,6 +515,8 @@ function StoryForm({ isOpen, onClose, onSave, location }) {
       } catch (error) {
         console.error('Error uploading files:', error);
         alert('Error uploading files. Please try again.');
+      } finally {
+        setIsLoading(false); // Stop loading
       }
     }
   };
@@ -777,31 +781,32 @@ function StoryForm({ isOpen, onClose, onSave, location }) {
           </button>
           <button
             onClick={handleSave}
-            disabled={!title.trim() || !content.trim() || !category}
+            disabled={!title.trim() || !content.trim() || !category || isLoading}
             style={{
               padding: '12px 24px',
               border: '1px solid #000000ff',
-              backgroundColor: (title.trim() && content.trim() && category) ? '#EBBDD9' : '#a9a094ff',
+              backgroundColor: (title.trim() && content.trim() && category && !isLoading) ? '#EBBDD9' : '#a9a094ff',
               color: 'black',
               borderRadius: '12px',
               fontSize: '14px',
               fontWeight: '600',
-              cursor: (title.trim() && content.trim() && category) ? 'pointer' : 'not-allowed',
+              cursor: (title.trim() && content.trim() && category && !isLoading) ? 'pointer' : 'not-allowed',
               fontFamily: 'Space Mono, monospace',
-              transition: 'background-color 0.3s ease-in-out, transform 0.2s ease'
+              transition: 'background-color 0.3s ease-in-out, transform 0.2s ease',
+              opacity: isLoading ? 0.7 : 1
             }}
             onMouseEnter={(e) => {
-              if (title.trim() && content.trim() && category) {
+              if (title.trim() && content.trim() && category && !isLoading) {
                 e.target.style.backgroundColor = '#D25E29';
-            }
+              }
             }}
             onMouseLeave={(e) => {
-              if (title.trim() && content.trim() && category) {
+              if (title.trim() && content.trim() && category && !isLoading) {
                 e.target.style.backgroundColor = '#EBBDD9';
               }
             }}
           >
-            Save
+            {isLoading ? 'Saving...' : 'Save'}
           </button>
         </div>
       </div>
