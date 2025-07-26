@@ -1690,6 +1690,12 @@ export default function Map() {
         setSelectedStory(clickedStory);
         setShowStoryViewer(true);
       } else {
+        // Remove existing search marker when clicking elsewhere
+        if (currentMarker) {
+          currentMarker.remove();
+          setCurrentMarker(null);
+        }
+        
         // Add new story at this location
         setSelectedLocation({ lat, lng });
         setShowStoryForm(true);
