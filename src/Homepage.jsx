@@ -41,7 +41,8 @@ export default function Homepage() {
   // Responsive breakpoints
   const isMobile = windowWidth <= 768;
   const isTablet = windowWidth > 768 && windowWidth <= 1024;
-  const isDesktop = windowWidth > 1024;
+  const isMacBookAir = windowWidth > 1024 && windowWidth <= 1440;
+  const isDesktop = windowWidth > 1440;
 
   useEffect(() => {
     if (currentIndex < fullText.length) {
@@ -90,6 +91,12 @@ export default function Homepage() {
         markersThreshold: 900,
         humansThreshold: 2000,
         humansFadeStart: 2000
+      };
+    } else if (isMacBookAir) {
+      return {
+        markersThreshold: 1000,
+        humansThreshold: 1200,
+        humansFadeStart: 1200
       };
     }
     return {
@@ -175,6 +182,13 @@ const cityscapeOpacity = Math.min(1 + scrollY * 0.001, 1);
       human2: { left: '10%', bottom: '3%', height: '230px' },
       human3: { left: '47%', bottom: '5%', height: '260px' },
       human4: { left: '80%', bottom: '15%', height: '310px' }
+    };
+  } else if (isMacBookAir) {
+    return {
+      human1: { left: '-8%', bottom: '4%', height: '420px' },
+      human2: { left: '13%', bottom: '3%', height: '250px' },
+      human3: { left: '48%', bottom: '5%', height: '280px' },
+      human4: { left: '80%', bottom: '15%', height: '350px' }
     };
   }
   // Desktop (original positions)
@@ -398,7 +412,7 @@ const humanPos = getHumanPositions();
           opacity: cityscapeDisplayOpacity,
           transition: 'transform 0.3s ease-out, opacity 0.5s ease-out',
           width: '100%',
-          maxWidth: isMobile ? '100%' : isTablet ? '900px' : '1200px',
+          maxWidth: isMobile ? '100%' : isTablet ? '900px' : isMacBookAir ? '1000px' : '1200px',
           zIndex: 1,
           pointerEvents: 'none'
         }}>
@@ -465,8 +479,8 @@ const humanPos = getHumanPositions();
             transform: 'translateX(-50%)',
             transformOrigin: 'bottom center',
             width: '100%',
-            maxWidth: isMobile ? '100%' : isTablet ? '900px' : '1200px',
-            height: isMobile ? '250px' : isTablet ? '320px' : '400px',
+            maxWidth: isMobile ? '100%' : isTablet ? '900px' : isMacBookAir ? '1000px' : '1200px',
+            height: isMobile ? '250px' : isTablet ? '320px' : isMacBookAir ? '380px' : '400px',
             zIndex: 1,
             pointerEvents: 'none'
           }}>
@@ -709,8 +723,8 @@ const humanPos = getHumanPositions();
 
           {/* Explore Button positioned right under the text */}
           <div style={{
-            transform: `translateY(${Math.max(0, (scrollY - (isMobile ? 1200 : isTablet ? 1500 : 1700)) * -0.1) - 100}px)`,
-            opacity: Math.min(1, Math.max(0, (scrollY - (isMobile ? 1200 : isTablet ? 1500 : 1700)) / 300)),
+            transform: `translateY(${Math.max(0, (scrollY - (isMobile ? 1200 : isTablet ? 1500 : isMacBookAir ? 1400 : 1700)) * -0.1) - 100}px)`,
+            opacity: Math.min(1, Math.max(0, (scrollY - (isMobile ? 1200 : isTablet ? 1500 : isMacBookAir ? 1400 : 1700)) / 300)),
             transition: 'transform 0.1s ease-out, opacity 0.1s ease-out'
           }}>
             <a 
