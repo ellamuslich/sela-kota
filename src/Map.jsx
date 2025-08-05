@@ -1902,9 +1902,6 @@ export default function Map() {
     };
     
     setUserStories(prev => [newStory, ...prev]); // Add immediately
-    
-    // Then save to database in background
-    saveStoryToAPI(story);
 
     // Store current map center and zoom before saving
     const currentCenter = mapRef.current.getCenter();
