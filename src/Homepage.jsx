@@ -68,6 +68,15 @@ export default function Homepage() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Function to scroll to first threshold (second section)
+  const scrollToFirstSection = () => {
+    const firstSectionY = window.innerHeight; // Scroll to one viewport height down
+    window.scrollTo({
+      top: firstSectionY,
+      behavior: 'smooth'
+    });
+  };
+
   // Responsive scroll thresholds
   const getScrollThresholds = () => {
     if (isMobile) {
@@ -334,37 +343,50 @@ const humanPos = getHumanPositions();
           }}>|</span>
         </p>
 
-        {/* Call to Action Button */}
-        <a 
-          href="/map"
+        {/* Scroll Indicator with Arrow */}
+        <div 
+          onClick={scrollToFirstSection}
           style={{
-            display: 'inline-block',
-            padding: isMobile ? '14px 24px' : '16px 32px',
-            backgroundColor: '#2c2c2c',
-            color: 'white',
-            textDecoration: 'none',
-            fontSize: isMobile ? '14px' : '16px',
-            fontWeight: '500',
-            borderRadius: '30px',
-            transition: 'all 0.3s ease',
-            letterSpacing: '0.5px',
-            fontFamily: 'Space Mono, monospace',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            cursor: 'pointer',
             transform: `translateY(${scrollY * 0.03}px)`,
             zIndex: 10,
             position: 'relative',
-            marginBottom: isMobile ? '80px' : isTablet ? '100px' : '120px'
+            marginBottom: isMobile ? '80px' : isTablet ? '100px' : '120px',
+            transition: 'all 0.3s ease'
           }}
           onMouseEnter={(e) => {
-            e.target.style.backgroundColor = '#EBBDD9';
-            e.target.style.transform = `translateY(${scrollY * 0.03 - 2}px)`;
+            e.currentTarget.style.transform = `translateY(${scrollY * 0.03 - 5}px)`;
           }}
           onMouseLeave={(e) => {
-            e.target.style.backgroundColor = '#000000';
-            e.target.style.transform = `translateY(${scrollY * 0.03}px)`;
+            e.currentTarget.style.transform = `translateY(${scrollY * 0.03}px)`;
           }}
         >
-          {isMobile ? 'Explore Sela Kota' : 'Explore Sela Kota Jakarta'}
-        </a>
+          {/* Scroll down text */}
+          <span style={{
+            fontSize: isMobile ? '12px' : '14px',
+            fontFamily: 'Space Mono, monospace',
+            color: 'black',
+            marginBottom: '8px',
+            letterSpacing: '0.5px'
+          }}>
+            Scroll to explore more!
+          </span>
+          
+          {/* Custom SVG Button */}
+          <img 
+            src="/scroll-down-arrow.svg" 
+            alt="Scroll Down" 
+            style={{
+              width: isMobile ? '32px' : '40px',
+              height: isMobile ? '32px' : '40px',
+              transition: 'transform 0.3s ease',
+              animation: 'bounce 2s infinite'
+            }}
+          />
+        </div>
 
         {/* Growing Jakarta Cityscape stuck to bottom - dissolves when humans appear */}
         <div style={{
@@ -536,6 +558,18 @@ const humanPos = getHumanPositions();
                 transform: translate(-50%, -50%) scale(1) translateY(0);
               }
             }
+            
+            @keyframes bounce {
+              0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+              }
+              40% {
+                transform: translateY(-5px);
+              }
+              60% {
+                transform: translateY(-3px);
+              }
+            }
           `}
         </style>
 
@@ -646,6 +680,7 @@ const humanPos = getHumanPositions();
         zIndex: 10,
         minHeight: '50vh',
         display: 'flex',
+        flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center'
       }}>
@@ -658,19 +693,55 @@ const humanPos = getHumanPositions();
           transition: 'transform 0.1s ease-out, opacity 0.1s ease-out'
         }}>
           <p style={{
-          fontSize: isMobile ? '14px' : '16px',
-          lineHeight: '1.8',
-          color: '#2c2c2c',
-          fontFamily: 'Space Mono, monospace',
-          fontWeight: '400',
-          marginBottom: '0'
-        }}>
-          Meaning lives in the in-between. In a quiet warung, a glance
-          {isMobile ? ' ' : isTablet ? ' ' : <br/>}
-          between strangers, a balcony overlooking the sunset.
-          {isMobile ? ' ' : isTablet ? ' ' : <br/>}
-          sela kota exists to bring those overlooked spaces and feelings into view.
-        </p>
+            fontSize: isMobile ? '14px' : '16px',
+            lineHeight: '1.8',
+            color: '#2c2c2c',
+            fontFamily: 'Space Mono, monospace',
+            fontWeight: '400',
+            marginBottom: '150px'
+          }}>
+            Meaning lives in the in-between. In a quiet warung, a glance
+            {isMobile ? ' ' : isTablet ? ' ' : <br/>}
+            between strangers, a balcony overlooking the sunset.
+            {isMobile ? ' ' : isTablet ? ' ' : <br/>}
+            sela kota exists to bring those overlooked spaces and feelings into view.
+          </p>
+
+          {/* Explore Button positioned right under the text */}
+          <div style={{
+            transform: `translateY(${Math.max(0, (scrollY - 1700) * -0.1) - 100}px)`,
+            opacity: Math.min(1, Math.max(0, (scrollY - 1700) / 300)),
+            transition: 'transform 0.1s ease-out, opacity 0.1s ease-out'
+          }}>
+            <a 
+              href="/map"
+              style={{
+                display: 'inline-block',
+                padding: isMobile ? '16px 32px' : '20px 40px',
+                backgroundColor: '#2c2c2c',
+                color: 'white',
+                textDecoration: 'none',
+                fontSize: isMobile ? '16px' : '18px',
+                fontWeight: '500',
+                borderRadius: '60px',
+                transition: 'all 0.3s ease',
+                letterSpacing: '0.5px',
+                fontFamily: 'Space Mono, monospace',
+                zIndex: 10,
+                position: 'relative'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.backgroundColor = '#EBBDD9';
+                e.target.style.transform = 'translateY(-2px)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.backgroundColor = '#2c2c2c';
+                e.target.style.transform = 'translateY(0px)';
+              }}
+            >
+              {isMobile ? 'Explore Sela Kota' : 'Explore Sela Kota: Jakarta'}
+            </a>
+          </div>
         </div>
       </section>
     </div>
