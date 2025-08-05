@@ -709,8 +709,8 @@ const humanPos = getHumanPositions();
 
           {/* Explore Button positioned right under the text */}
           <div style={{
-            transform: `translateY(${Math.max(0, (scrollY - 1700) * -0.1) - 100}px)`,
-            opacity: Math.min(1, Math.max(0, (scrollY - 1700) / 300)),
+            transform: `translateY(${Math.max(0, (scrollY - (isMobile ? 1200 : isTablet ? 1500 : 1700)) * -0.1) - 100}px)`,
+            opacity: Math.min(1, Math.max(0, (scrollY - (isMobile ? 1200 : isTablet ? 1500 : 1700)) / 300)),
             transition: 'transform 0.1s ease-out, opacity 0.1s ease-out'
           }}>
             <a 
