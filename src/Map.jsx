@@ -294,15 +294,26 @@ function PrivacyPolicyModal({ isOpen, onClose }) {
           fontSize: '24px', 
           fontWeight: '700',
           color: '#111827',
-          lineHeight: '1.3'
+          lineHeight: '1.3',
+          marginBottom: '10px',
         }}>
           Privacy Policy
         </h2>
+        {/* Introductory text */}
+        <div style={{ 
+          fontSize: '14px', 
+          lineHeight: '1.3',
+          color: '#000000ff',
+          marginBottom: '30px',
+          fontWeight: '600',
+        }}>
+          We believe in keeping things simple and transparent. Here's what you should know about how Sela Kota works:
+        </div>
 
         <div style={{ 
           fontSize: '14px', 
-          lineHeight: '1.6',
-          color: '#374151'
+          lineHeight: '1.5',
+          color: '#000000ff'
         }}>
           {/* Section 1 */}
           <div style={{ marginBottom: '24px' }}>
@@ -310,18 +321,18 @@ function PrivacyPolicyModal({ isOpen, onClose }) {
               fontSize: '16px', 
               fontWeight: '600',
               color: '#111827',
-              margin: '0 0 12px 0'
+              margin: '0 0 10px 0'
             }}>
               1. Information We Collect
             </h3>
             <div style={{ marginBottom: '12px' }}>
-              <strong>User Content:</strong> Users may voluntarily provide User Content, such as personal stories, experiences, and other content, in text format.
+              <strong>Your Stories:</strong> The personal experiences and urban stories you choose to share with the community.
             </div>
             <div style={{ marginBottom: '12px' }}>
-              <strong>Location Data:</strong> Users may voluntarily select a location on the map where they would like their User Content to appear. We do not collect information about users' actual location.
+              <strong>Map Locations:</strong> The spots you pick on the map for your stories. We don't track where you actually are!
             </div>
             <div>
-              <strong>Time Data:</strong> We collect the time that a user's submission is made. This is so that we can organize submissions chronologically in our database.
+              <strong>Timestamps:</strong> Just the time you submit, so we can organize stories chronologically.
             </div>
           </div>
 
@@ -331,15 +342,15 @@ function PrivacyPolicyModal({ isOpen, onClose }) {
               fontSize: '16px', 
               fontWeight: '600',
               color: '#111827',
-              margin: '0 0 12px 0'
+              margin: '0 0 10px 0'
             }}>
               2. Use of Information
             </h3>
             <div style={{ marginBottom: '12px' }}>
-              <strong>Platform Functionality:</strong> We use the information collected to provide and improve the functionality of Sela Kota, allowing users to share and explore urban experiences.
+              <strong>Platform Functionality:</strong> We display your stories on the map so others can discover and connect with Jakarta better.
             </div>
             <div>
-              <strong>Research and Dissemination:</strong> We may analyze and use aggregated, non-personal data for research and artistic purposes to enhance the platform's overall experience and mission.
+              <strong>Research:</strong> We may analyze patterns in anonymous, grouped data to improve the platform and support our research mission.
             </div>
           </div>
 
@@ -354,7 +365,7 @@ function PrivacyPolicyModal({ isOpen, onClose }) {
               3. Disclosure of Information
             </h3>
             <div style={{ marginBottom: '12px' }}>
-              <strong>Anonymity:</strong> Users contribute anonymously if they choose not to associate their contributions with identifiable information. Users cannot create accounts, so no usernames, passwords, phone numbers, email addresses or social media handles are associated with contributions. We moderate all contributions for breaches of anonymity.
+              <strong>Anonymity:</strong> You don't need to create accounts or share personal details like emails or phone numbers. We reviews submissions to make sure nothing accidentally reveals who you are
             </div>
             <div>
               <strong>Legal Compliance:</strong> We may disclose information in response to legal processes or when required to comply with applicable laws, regulations, or government requests.
@@ -372,7 +383,7 @@ function PrivacyPolicyModal({ isOpen, onClose }) {
               4. Third-Party Services
             </h3>
             <div>
-              Sela Kota may use third-party services for analytics, hosting, and other functionalities. These services may have their own privacy policies, and users are encouraged to review them.
+             We partner with trusted services for things like hosting and understanding how the platform is used. They follow their own privacy rules too.
             </div>
           </div>
 
@@ -387,7 +398,7 @@ function PrivacyPolicyModal({ isOpen, onClose }) {
               5. Security
             </h3>
             <div>
-              We implement reasonable measures to protect the information we collect from unauthorized access, disclosure, or alteration. However, no data transmission over the internet is entirely secure, and we cannot guarantee absolute security.
+             We work hard to protect your information, though no system online is 100% foolproof.
             </div>
           </div>
         </div>
@@ -1054,12 +1065,10 @@ function AnimatedSearchBar({
   onSelectLocation, 
   searchResults, 
   isSearching,
-  placeholder = "Search Sela Kota Jakarta" 
+  placeholder = "Search locations..." 
 }) {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(true); // Start expanded
   const [inputValue, setInputValue] = useState('');
-
-  //Responsive state search bar
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
 
   const inputRef = useRef(null);
@@ -1075,21 +1084,18 @@ function AnimatedSearchBar({
   //Breakpoint for search bar
    const isMobile = windowWidth <= 768;
 
-  // Handle clicks outside to collapse
+  // Auto-collapse after a delay on mobile for better UX
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(event.target) &&
-        inputValue === ""
-      ) {
+    let timer;
+    if (isMobile && isExpanded && inputValue === '') {
+      timer = setTimeout(() => {
         setIsExpanded(false);
-      }
+      }, 3000); // Auto-collapse after 3 seconds of no interaction on mobile
+    }
+    return () => {
+      if (timer) clearTimeout(timer);
     };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [inputValue]);
+  }, [isMobile, isExpanded, inputValue]);
 
   // Focus input when expanded
   useEffect(() => {
@@ -1138,14 +1144,15 @@ function AnimatedSearchBar({
         display: 'flex',
         alignItems: 'center',
         backgroundColor: 'rgba(255, 255, 255, 0.4)',
-        backdropFilter: 'blur(10px)', // Background blur effect
-        WebkitBackdropFilter: 'blur(10px)', // Safari support
+        backdropFilter: 'blur(10px)',
+        WebkitBackdropFilter: 'blur(10px)', // FOR SAFARI USPPORT
         borderRadius: '25px',
         boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
         width: isMobile ? '45px' : (isExpanded ? '320px' : '50px'),
         height: isMobile ? '45px' : '50px', 
         transition: 'width 0.3s ease-in-out',
-        overflow: 'hidden'
+        overflow: 'hidden',
+        position: 'relative',
       }}>
         {/* Search Icon */}
         <button
@@ -1154,7 +1161,6 @@ function AnimatedSearchBar({
           style={{
             width: isMobile ? '100%' : (isExpanded ? '50px' : '100%'),
             height: isMobile ? '45px' : '50px',
-            height: '50px',
             border: 'none',
             background: 'none',
             display: 'flex',
@@ -1184,7 +1190,7 @@ function AnimatedSearchBar({
               outline: 'none',
               background: 'none',
               flex: 1,
-              fontSize: isMobile ? '16px' : '14px',
+              fontSize: '14px',
               color: '#111827',
               fontFamily: 'Space Mono, monospace',
               opacity: isExpanded ? 1 : 0,
@@ -1194,26 +1200,33 @@ function AnimatedSearchBar({
           />
         )}
 
-        {/* Clear Button */}
-        {!isMobile && isExpanded && inputValue && (
+        {/* Close Button */}
+        {!isMobile && isExpanded && (
           <button
             type="button"
             onClick={handleClear}
             style={{
               position: 'absolute',
               right: '12px',
-              width: '20px',
-              height: '20px',
+              width: '24px',
+              height: '24px',
               border: 'none',
               background: 'none',
               cursor: 'pointer',
-              color: '#9CA3AF',
+              color: '#6B7280',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center'
+              justifyContent: 'center',
+              transition: 'all 0.2s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.color = '#374151';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.color = '#6B7280';
             }}
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <line x1="18" y1="6" x2="6" y2="18"></line>
               <line x1="6" y1="6" x2="18" y2="18"></line>
             </svg>
@@ -1221,11 +1234,11 @@ function AnimatedSearchBar({
         )}
       </div>
 
-      {/* Mobile expanded input - shows below the search icon */}
+      {/* Mobile expanded input with close button */}
       {isMobile && isExpanded && (
         <div style={{
           position: 'absolute',
-          top: '55px', // Below the search icon
+          top: '55px',
           left: '0',
           right: '0',
           backgroundColor: 'rgba(255, 255, 255, 0.4)',
@@ -1235,7 +1248,10 @@ function AnimatedSearchBar({
           boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
           padding: '12px',
           zIndex: 1002,
-          width: '200px'
+          width: '200px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px'
         }}>
           <input
             ref={inputRef}
@@ -1247,12 +1263,34 @@ function AnimatedSearchBar({
               border: 'none',
               outline: 'none',
               background: 'none',
-              width: '100%',
+              flex: 1,
               fontSize: '12px',
               color: '#111827',
               fontFamily: 'Space Mono, monospace'
             }}
           />
+          {/* Mobile Close Button */}
+          <button
+            type="button"
+            onClick={handleClear}
+            style={{
+              width: '20px',
+              height: '20px',
+              border: 'none',
+              background: 'none',
+              cursor: 'pointer',
+              color: '#6B7280',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0
+            }}
+          >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
         </div>
       )}
 
@@ -1392,7 +1430,7 @@ function ExpandableInstructionPanel({ onFilterChange, activeFilters, onPrivacyPo
               padding: '4px'
             }}
           >
-            ✕
+            —
           </button>
 
           {/* Main Heading */}
